@@ -7,7 +7,7 @@ $color = ($elegido == 0) ? 'oscuro' : 'claro';
 	<meta charset="utf-8" />
 	<title>Jos&eacute; Tom&aacute;s Albornoz</title>
 	<meta content="18 a&ntilde;os, programador, ser humano." name="description" />
-	<meta name="keywords" content="jojo, eljojo, jose, tomas, albornoz, rodriguez, JOjoDesigns, eljojo2, mychemicaljojo, purininis, ajipirijou, el, jojo, www.purininis.com, purininis.com,eljojo.net, ajipirijou.com, donsaludador, jojobots, dondespedidor, sraclima" />
+	<meta name="keywords" content="jojo, eljojo, jose, tomas, albornoz, rodriguez, JOjoDesigns, eljojo2, mychemicaljojo, purininis, ajipirijou, el, jojo, www.purininis.com, purininis.com, eljojo.net, ajipirijou.com, donsaludador, jojobots, dondespedidor, sraclima" />
 	<link rel="canonical" href="http://josealbornoz.cl/" />
 	<meta property="og:title" content="Jos&eacute; Tom&aacute;s Albornoz"/>
 	<meta property="og:description" content="18 a&ntilde;os, programador, ser humano." />
@@ -16,7 +16,7 @@ $color = ($elegido == 0) ? 'oscuro' : 'claro';
 	<meta property="og:image" content="http://perfectirijillo.com/eljojo.net/yo/yo_1_1.jpg"/>
 	<meta property="fb:admins" content="586872350"/>
 	
-	<link href="estilo.css?v=1.1" media="screen, projection" rel="stylesheet" type="text/css" />
+	<link href="estilo.css?v=1.2" media="screen, projection" rel="stylesheet" type="text/css" />
 	<meta name="viewport" content = "width=850,height=device-height, initial-scale = 0.55, minimum-scale = 0.55, maximum-scale = 1.5" />  
 	<link rel="shortcut icon" href="yo.png" />
 	<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -49,19 +49,19 @@ $color = ($elegido == 0) ? 'oscuro' : 'claro';
 	<section>
 		<p>
 			<span>Tengo 18 a&ntilde;os y vivo en Santiago, Chile.</span><br />
-			<span>Hago lo que me gusta, codeo sitios web y cuando me aburro juego con la API de twitter.</span><br />
-			<span>Me gusta integrar sistemas, trabajar con servidores y hacer proyectos s&oacute;lo por el hecho de hacerlos.</span>
+			<span>Soy el cuarto miembro de <a href="http://ajipirijou.com/vida-diaria/acerca-de-mi-trabajo-actual">una StartUp</a> de StartUp Chile. Trabajo como desarrollador / head geek.</span><br />
+			<span>Me gusta integrar sistemas, trabajar con servidores y hacer proyectos fuera de lo com&uacute;n.</span>
 		</p>
 		<p>
-			<span>En la vida real me gusta <a href="http://flickr.com/photos/eljojo/">la fotograf&iacute;a</a>, escribir en <a href="http://ajipirijou.com">mi blog</a> y <a href="http://last.fm/user/eljojo_net">escuchar m&uacute;sica</a>.</span>
+			<span>Uno de mis hobbies es <a href="http://flickr.com/photos/eljojo/">la fotograf&iacute;a</a>, a veces escribo en <a href="http://ajipirijou.com">mi blog</a>. Me gusta mucho <a href="http://last.fm/user/eljojo_net">escuchar m&uacute;sica</a>.</span>
 		</p>
 		<p>
-			<span>En internet tengo <a href="http://twitter.com/eljojo">twitter</a>, <a href="http://www.purininis.com">tumblr</a> y <a href="http://delicious.com/eljojo2">delicious</a>.</span>
+			<span>En internet tengo presencia en <a href="http://twitter.com/eljojo">twitter</a>, <a href="http://www.purininis.com">tumblr</a> y <a href="http://delicious.com/eljojo2">delicious</a>.</span>
 		</p>
 	</section>
 	<footer>
 		<p>
-			<span>Mi correo es  
+			<span>Me puedes mandar un correo a   
 				<script type="text/javascript">
 				//<![CDATA[
 				<!--

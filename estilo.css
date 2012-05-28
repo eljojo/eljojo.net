@@ -55,7 +55,8 @@ span {
 	background: none repeat scroll 0 0 #CC9944;
 	color: #113300;
 	text-shadow:none;
-	padding:1px;
+	padding:5px;
+  line-height: 30px;
 }
 @media screen and (max-device-width: 480px){
 	body{
