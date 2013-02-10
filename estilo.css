@@ -18,8 +18,8 @@ body {
 
 h1 {
 	font-family: 'Salsa', cursive;
-	font-size:2em;
-	margin-bottom:0;
+	font-size: 2em;
+	margin-bottom: 0;
   margin-left: -60px;
 }
 
@@ -36,24 +36,41 @@ a:hover {
 	text-decoration: underline;
 }
 
-
-span {
-	color: #113300;
-	text-shadow:none;
-	padding:5px;
-  line-height: 30px;
-}
-
 @media screen and (max-device-width: 480px){
 	body{
 		background-size: auto 800px;
 	}
 }
 
-
-/*body {
-  background-image: url("backgrounds/2560x1600_b9dab2da1ecbb9ac605b9d3fb8e38121201110280759441.jpeg");
+body.light {
+  color: #fafafa;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 1);
 }
-*/
+
+body.light a, body.light a:visited{
+	color: #fff;
+	text-decoration: none;
+}
+
+body.color p {
+  background: rgba(216, 19, 19, 0.8);
+}
+
+body.color.light p {
+  text-shadow: none;
+}
+
+body.dark_header h1 {
+  color: #333333 !important;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5) !important;
+}
+
+body.more_shadow {
+  text-shadow: 2px 2px 0 rgba(255, 255, 255, 0.5);
+}
+body.more_shadow.light {
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 1);
+}
+
 ::-moz-selection { background: #D81313; color: #fff; text-shadow: none; }
 ::selection { background: #D81313; color: #fff; text-shadow: none; }

@@ -30,7 +30,8 @@
 			wallpaper = shuffle(wallpapers)[0]
 			image = wallpaper.link.split('/')[4]
 			$('body').css('background-image', "url(backgrounds/2560x1600_" + image + "1.jpeg)")
-			console.log(wallpaper)
+			console.log(image)
+			$('body').addClass(wallpaper.classes)
 		})
 	})
 	</script>
@@ -41,7 +42,7 @@
 	</header>
 	<section>
 		<p>
-			I'm a 19 year-old web developer living in Berlin.
+			I'm a 19 year-old chilean web developer living in Berlin.
       <br />
 			I'm into Ruby, Rails, Node JS and all those fancy technologies.
 			<br />

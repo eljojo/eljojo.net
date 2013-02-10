@@ -1,25 +1,5 @@
 [
    {
-      "author":"Merijn Hos",
-      "download":[
-         "http://www.kuvva.com/wallpapers/b79314a54b7f14491fafd946ec6ab22b20110428135832/sizes/1280x800.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/b79314a54b7f14491fafd946ec6ab22b20110428135832/sizes/1680x1050.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/b79314a54b7f14491fafd946ec6ab22b20110428135832/sizes/1920x1080.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/b79314a54b7f14491fafd946ec6ab22b20110428135832/sizes/2560x1600.jpeg?md=1"
-      ],
-      "link":"http://www.kuvva.com/wallpapers/b79314a54b7f14491fafd946ec6ab22b20110428135832"
-   },
-   {
-      "author":"FOAM Talent",
-      "download":[
-         "http://www.kuvva.com/wallpapers/d7f652ae2026fa8df3a2b52a123888a020120320063124/sizes/1280x800.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/d7f652ae2026fa8df3a2b52a123888a020120320063124/sizes/1680x1050.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/d7f652ae2026fa8df3a2b52a123888a020120320063124/sizes/1920x1080.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/d7f652ae2026fa8df3a2b52a123888a020120320063124/sizes/2560x1600.jpeg?md=1"
-      ],
-      "link":"http://www.kuvva.com/wallpapers/d7f652ae2026fa8df3a2b52a123888a020120320063124"
-   },
-   {
       "author":"MiraRuido",
       "download":[
          "http://www.kuvva.com/wallpapers/11f0913720d78321cfe68b0da6d7010620120413050117/sizes/1280x800.jpeg?md=1",
@@ -27,7 +7,8 @@
          "http://www.kuvva.com/wallpapers/11f0913720d78321cfe68b0da6d7010620120413050117/sizes/1920x1080.jpeg?md=1",
          "http://www.kuvva.com/wallpapers/11f0913720d78321cfe68b0da6d7010620120413050117/sizes/2560x1600.jpeg?md=1"
       ],
-      "link":"http://www.kuvva.com/wallpapers/11f0913720d78321cfe68b0da6d7010620120413050117"
+      "link":"http://www.kuvva.com/wallpapers/11f0913720d78321cfe68b0da6d7010620120413050117",
+      "classes": ""
    },
    {
       "author":"Zenk One",
@@ -37,17 +18,8 @@
          "http://www.kuvva.com/wallpapers/04d8e49cee29a1dd6654340451437ec720120420095948/sizes/1920x1080.jpeg?md=1",
          "http://www.kuvva.com/wallpapers/04d8e49cee29a1dd6654340451437ec720120420095948/sizes/2560x1600.jpeg?md=1"
       ],
-      "link":"http://www.kuvva.com/wallpapers/04d8e49cee29a1dd6654340451437ec720120420095948"
-   },
-   {
-      "author":"French",
-      "download":[
-         "http://www.kuvva.com/wallpapers/4b775f1a2fd4642d2bed86c5617e04ac20120630101444/sizes/1280x800.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/4b775f1a2fd4642d2bed86c5617e04ac20120630101444/sizes/1680x1050.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/4b775f1a2fd4642d2bed86c5617e04ac20120630101444/sizes/1920x1080.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/4b775f1a2fd4642d2bed86c5617e04ac20120630101444/sizes/2560x1600.jpeg?md=1"
-      ],
-      "link":"http://www.kuvva.com/wallpapers/4b775f1a2fd4642d2bed86c5617e04ac20120630101444"
+      "link":"http://www.kuvva.com/wallpapers/04d8e49cee29a1dd6654340451437ec720120420095948",
+      "classes": "light color dark_header"
    },
    {
       "author":"Carlos Alberto",
@@ -57,27 +29,8 @@
          "http://www.kuvva.com/wallpapers/dc42f2b22987f90f83a30a96c4b62e2920120909115637/sizes/1920x1080.jpeg?md=1",
          "http://www.kuvva.com/wallpapers/dc42f2b22987f90f83a30a96c4b62e2920120909115637/sizes/2560x1600.jpeg?md=1"
       ],
-      "link":"http://www.kuvva.com/wallpapers/dc42f2b22987f90f83a30a96c4b62e2920120909115637"
-   },
-   {
-      "author":"Pure Photo",
-      "download":[
-         "http://www.kuvva.com/wallpapers/a29edff28c56e61a2cca4b60c0391f9620111128075444/sizes/1280x800.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/a29edff28c56e61a2cca4b60c0391f9620111128075444/sizes/1680x1050.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/a29edff28c56e61a2cca4b60c0391f9620111128075444/sizes/1920x1080.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/a29edff28c56e61a2cca4b60c0391f9620111128075444/sizes/2560x1600.jpeg?md=1"
-      ],
-      "link":"http://www.kuvva.com/wallpapers/a29edff28c56e61a2cca4b60c0391f9620111128075444"
-   },
-   {
-      "author":"Mitja Arzenšek",
-      "download":[
-         "http://www.kuvva.com/wallpapers/7abf997bc2753ddedbe53805e9d02a4720111118072406/sizes/1280x800.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/7abf997bc2753ddedbe53805e9d02a4720111118072406/sizes/1680x1050.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/7abf997bc2753ddedbe53805e9d02a4720111118072406/sizes/1920x1080.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/7abf997bc2753ddedbe53805e9d02a4720111118072406/sizes/2560x1600.jpeg?md=1"
-      ],
-      "link":"http://www.kuvva.com/wallpapers/7abf997bc2753ddedbe53805e9d02a4720111118072406"
+      "link":"http://www.kuvva.com/wallpapers/dc42f2b22987f90f83a30a96c4b62e2920120909115637",
+      "classes": ""
    },
    {
       "author":"Ian Stevenson",
@@ -87,7 +40,8 @@
          "http://www.kuvva.com/wallpapers/29fbd450abbd0fc7ad8cb5c0601731e320111215102933/sizes/1920x1080.jpeg?md=1",
          "http://www.kuvva.com/wallpapers/29fbd450abbd0fc7ad8cb5c0601731e320111215102933/sizes/2560x1600.jpeg?md=1"
       ],
-      "link":"http://www.kuvva.com/wallpapers/29fbd450abbd0fc7ad8cb5c0601731e320111215102933"
+      "link":"http://www.kuvva.com/wallpapers/29fbd450abbd0fc7ad8cb5c0601731e320111215102933",
+      "classes": "light color dark_header"
    },
    {
       "author":"Dan Matutina",
@@ -97,27 +51,8 @@
          "http://www.kuvva.com/wallpapers/ef60eb3e1fe504a76fbf4f433389188f20111028075604/sizes/1920x1080.jpeg?md=1",
          "http://www.kuvva.com/wallpapers/ef60eb3e1fe504a76fbf4f433389188f20111028075604/sizes/2560x1600.jpeg?md=1"
       ],
-      "link":"http://www.kuvva.com/wallpapers/ef60eb3e1fe504a76fbf4f433389188f20111028075604"
-   },
-   {
-      "author":"Little White Lies",
-      "download":[
-         "http://www.kuvva.com/wallpapers/aeb114de70a508e4e92772e56d7b523020111118081203/sizes/1280x800.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/aeb114de70a508e4e92772e56d7b523020111118081203/sizes/1680x1050.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/aeb114de70a508e4e92772e56d7b523020111118081203/sizes/1920x1080.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/aeb114de70a508e4e92772e56d7b523020111118081203/sizes/2560x1600.jpeg?md=1"
-      ],
-      "link":"http://www.kuvva.com/wallpapers/aeb114de70a508e4e92772e56d7b523020111118081203"
-   },
-   {
-      "author":"Emiliano Ponzi",
-      "download":[
-         "http://www.kuvva.com/wallpapers/c1e5810f76b10b8cad0f0a0d0202ef8620121204144342/sizes/1280x800.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/c1e5810f76b10b8cad0f0a0d0202ef8620121204144342/sizes/1680x1050.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/c1e5810f76b10b8cad0f0a0d0202ef8620121204144342/sizes/1920x1080.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/c1e5810f76b10b8cad0f0a0d0202ef8620121204144342/sizes/2560x1600.jpeg?md=1"
-      ],
-      "link":"http://www.kuvva.com/wallpapers/c1e5810f76b10b8cad0f0a0d0202ef8620121204144342"
+      "link":"http://www.kuvva.com/wallpapers/ef60eb3e1fe504a76fbf4f433389188f20111028075604",
+      "classes": ""
    },
    {
       "author":"Gabriel Diaz",
@@ -127,7 +62,8 @@
          "http://www.kuvva.com/wallpapers/93b71c1007ee80f0e3717cb1433ad04520121116150407/sizes/1920x1080.jpeg?md=1",
          "http://www.kuvva.com/wallpapers/93b71c1007ee80f0e3717cb1433ad04520121116150407/sizes/2560x1600.jpeg?md=1"
       ],
-      "link":"http://www.kuvva.com/wallpapers/93b71c1007ee80f0e3717cb1433ad04520121116150407"
+      "link":"http://www.kuvva.com/wallpapers/93b71c1007ee80f0e3717cb1433ad04520121116150407",
+      "classes": "light"
    },
    {
       "author":"Turnislefthome",
@@ -137,17 +73,8 @@
          "http://www.kuvva.com/wallpapers/55d0e766071139739eb1cb5c2f1d0a9220121026090442/sizes/1920x1080.jpeg?md=1",
          "http://www.kuvva.com/wallpapers/55d0e766071139739eb1cb5c2f1d0a9220121026090442/sizes/2560x1600.jpeg?md=1"
       ],
-      "link":"http://www.kuvva.com/wallpapers/55d0e766071139739eb1cb5c2f1d0a9220121026090442"
-   },
-   {
-      "author":"Alvaro Tapia-Hidalgo",
-      "download":[
-         "http://www.kuvva.com/wallpapers/1d409897b0007370de1bb71614f7a45420120525160007/sizes/1280x800.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/1d409897b0007370de1bb71614f7a45420120525160007/sizes/1680x1050.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/1d409897b0007370de1bb71614f7a45420120525160007/sizes/1920x1080.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/1d409897b0007370de1bb71614f7a45420120525160007/sizes/2560x1600.jpeg?md=1"
-      ],
-      "link":"http://www.kuvva.com/wallpapers/1d409897b0007370de1bb71614f7a45420120525160007"
+      "link":"http://www.kuvva.com/wallpapers/55d0e766071139739eb1cb5c2f1d0a9220121026090442",
+      "classes": "light"
    },
    {
       "author":"Dan Matutina",
@@ -157,7 +84,8 @@
          "http://www.kuvva.com/wallpapers/b9dab2da1ecbb9ac605b9d3fb8e3812120111028075944/sizes/1920x1080.jpeg?md=1",
          "http://www.kuvva.com/wallpapers/b9dab2da1ecbb9ac605b9d3fb8e3812120111028075944/sizes/2560x1600.jpeg?md=1"
       ],
-      "link":"http://www.kuvva.com/wallpapers/b9dab2da1ecbb9ac605b9d3fb8e3812120111028075944"
+      "link":"http://www.kuvva.com/wallpapers/b9dab2da1ecbb9ac605b9d3fb8e3812120111028075944",
+      "classes": ""
    },
    {
       "author":"Gabriel Diaz",
@@ -167,7 +95,8 @@
          "http://www.kuvva.com/wallpapers/3aca517c93d9716411947c64eda7c93220111027083819/sizes/1920x1080.jpeg?md=1",
          "http://www.kuvva.com/wallpapers/3aca517c93d9716411947c64eda7c93220111027083819/sizes/2560x1600.jpeg?md=1"
       ],
-      "link":"http://www.kuvva.com/wallpapers/3aca517c93d9716411947c64eda7c93220111027083819"
+      "link":"http://www.kuvva.com/wallpapers/3aca517c93d9716411947c64eda7c93220111027083819",
+      "classes": "light"
    },
    {
       "author":"Oliver Jeffers",
@@ -177,7 +106,8 @@
          "http://www.kuvva.com/wallpapers/2a4e72c954f2258b2e1b65de6ce5471220110902031629/sizes/1920x1080.jpeg?md=1",
          "http://www.kuvva.com/wallpapers/2a4e72c954f2258b2e1b65de6ce5471220110902031629/sizes/2560x1600.jpeg?md=1"
       ],
-      "link":"http://www.kuvva.com/wallpapers/2a4e72c954f2258b2e1b65de6ce5471220110902031629"
+      "link":"http://www.kuvva.com/wallpapers/2a4e72c954f2258b2e1b65de6ce5471220110902031629",
+      "classes": ""
    },
    {
       "author":"Art Lasovsky",
@@ -187,7 +117,8 @@
          "http://www.kuvva.com/wallpapers/b83dfca75795a97d89e9aae54d0d98da20121006143630/sizes/1920x1080.jpeg?md=1",
          "http://www.kuvva.com/wallpapers/b83dfca75795a97d89e9aae54d0d98da20121006143630/sizes/2560x1600.jpeg?md=1"
       ],
-      "link":"http://www.kuvva.com/wallpapers/b83dfca75795a97d89e9aae54d0d98da20121006143630"
+      "link":"http://www.kuvva.com/wallpapers/b83dfca75795a97d89e9aae54d0d98da20121006143630",
+      "classes": ""
    },
    {
       "author":"Cody Cobb",
@@ -197,17 +128,8 @@
          "http://www.kuvva.com/wallpapers/d135a26e6cfec0c80079ce0cdf23f1ce20120713184919/sizes/1920x1080.jpeg?md=1",
          "http://www.kuvva.com/wallpapers/d135a26e6cfec0c80079ce0cdf23f1ce20120713184919/sizes/2560x1600.jpeg?md=1"
       ],
-      "link":"http://www.kuvva.com/wallpapers/d135a26e6cfec0c80079ce0cdf23f1ce20120713184919"
-   },
-   {
-      "author":"Marius Roosendaal",
-      "download":[
-         "http://www.kuvva.com/wallpapers/7a3e741849ef5d3b1748027d6daacfce20120923133858/sizes/1280x800.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/7a3e741849ef5d3b1748027d6daacfce20120923133858/sizes/1680x1050.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/7a3e741849ef5d3b1748027d6daacfce20120923133858/sizes/1920x1080.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/7a3e741849ef5d3b1748027d6daacfce20120923133858/sizes/2560x1600.jpeg?md=1"
-      ],
-      "link":"http://www.kuvva.com/wallpapers/7a3e741849ef5d3b1748027d6daacfce20120923133858"
+      "link":"http://www.kuvva.com/wallpapers/d135a26e6cfec0c80079ce0cdf23f1ce20120713184919",
+      "classes": ""
    },
    {
       "author":"Karol Lasia",
@@ -217,17 +139,8 @@
          "http://www.kuvva.com/wallpapers/8816da63ba42821f28cd43232672f68620120503145541/sizes/1920x1080.jpeg?md=1",
          "http://www.kuvva.com/wallpapers/8816da63ba42821f28cd43232672f68620120503145541/sizes/2560x1600.jpeg?md=1"
       ],
-      "link":"http://www.kuvva.com/wallpapers/8816da63ba42821f28cd43232672f68620120503145541"
-   },
-   {
-      "author":"Maroesjka Lavigne",
-      "download":[
-         "http://www.kuvva.com/wallpapers/3a1cd65e0b76126af28a20667288944d20130201133609/sizes/1280x800.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/3a1cd65e0b76126af28a20667288944d20130201133609/sizes/1680x1050.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/3a1cd65e0b76126af28a20667288944d20130201133609/sizes/1920x1080.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/3a1cd65e0b76126af28a20667288944d20130201133609/sizes/2560x1600.jpeg?md=1"
-      ],
-      "link":"http://www.kuvva.com/wallpapers/3a1cd65e0b76126af28a20667288944d20130201133609"
+      "link":"http://www.kuvva.com/wallpapers/8816da63ba42821f28cd43232672f68620120503145541",
+      "classes": ""
    },
    {
       "author":"Maroesjka Lavigne",
@@ -237,7 +150,8 @@
          "http://www.kuvva.com/wallpapers/4f292a69f66bdc359105da24bd02092920130201133549/sizes/1920x1080.jpeg?md=1",
          "http://www.kuvva.com/wallpapers/4f292a69f66bdc359105da24bd02092920130201133549/sizes/2560x1600.jpeg?md=1"
       ],
-      "link":"http://www.kuvva.com/wallpapers/4f292a69f66bdc359105da24bd02092920130201133549"
+      "link":"http://www.kuvva.com/wallpapers/4f292a69f66bdc359105da24bd02092920130201133549",
+      "classes": ""
    },
    {
       "author":"Maroesjka Lavigne",
@@ -247,17 +161,8 @@
          "http://www.kuvva.com/wallpapers/9c35346a48881b63d10eb3298576381c20130201134312/sizes/1920x1080.jpeg?md=1",
          "http://www.kuvva.com/wallpapers/9c35346a48881b63d10eb3298576381c20130201134312/sizes/2560x1600.jpeg?md=1"
       ],
-      "link":"http://www.kuvva.com/wallpapers/9c35346a48881b63d10eb3298576381c20130201134312"
-   },
-   {
-      "author":"Zenk One",
-      "download":[
-         "http://www.kuvva.com/wallpapers/b8d56bf7bd14a1035a4aa2822e7ef15420120420095419/sizes/1280x800.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/b8d56bf7bd14a1035a4aa2822e7ef15420120420095419/sizes/1680x1050.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/b8d56bf7bd14a1035a4aa2822e7ef15420120420095419/sizes/1920x1080.jpeg?md=1",
-         "http://www.kuvva.com/wallpapers/b8d56bf7bd14a1035a4aa2822e7ef15420120420095419/sizes/2560x1600.jpeg?md=1"
-      ],
-      "link":"http://www.kuvva.com/wallpapers/b8d56bf7bd14a1035a4aa2822e7ef15420120420095419"
+      "link":"http://www.kuvva.com/wallpapers/9c35346a48881b63d10eb3298576381c20130201134312",
+      "classes": ""
    },
    {
       "author":"Gabriel Diaz",
@@ -267,7 +172,8 @@
          "http://www.kuvva.com/wallpapers/3f8c5f60a424b1bff202cf50bd5a44b620111027083243/sizes/1920x1080.jpeg?md=1",
          "http://www.kuvva.com/wallpapers/3f8c5f60a424b1bff202cf50bd5a44b620111027083243/sizes/2560x1600.jpeg?md=1"
       ],
-      "link":"http://www.kuvva.com/wallpapers/3f8c5f60a424b1bff202cf50bd5a44b620111027083243"
+      "link":"http://www.kuvva.com/wallpapers/3f8c5f60a424b1bff202cf50bd5a44b620111027083243",
+      "classes": ""
    },
    {
       "author":"Markus Reugels",
@@ -277,7 +183,8 @@
          "http://www.kuvva.com/wallpapers/f482c1ac17fffc70e270abf802865e2320120323102833/sizes/1920x1080.jpeg?md=1",
          "http://www.kuvva.com/wallpapers/f482c1ac17fffc70e270abf802865e2320120323102833/sizes/2560x1600.jpeg?md=1"
       ],
-      "link":"http://www.kuvva.com/wallpapers/f482c1ac17fffc70e270abf802865e2320120323102833"
+      "link":"http://www.kuvva.com/wallpapers/f482c1ac17fffc70e270abf802865e2320120323102833",
+      "classes": ""
    },
    {
       "author":"Markus Reugels",
@@ -287,7 +194,8 @@
          "http://www.kuvva.com/wallpapers/e86ce5b9b42320d5cc7d6d2e567f883120120323102228/sizes/1920x1080.jpeg?md=1",
          "http://www.kuvva.com/wallpapers/e86ce5b9b42320d5cc7d6d2e567f883120120323102228/sizes/2560x1600.jpeg?md=1"
       ],
-      "link":"http://www.kuvva.com/wallpapers/e86ce5b9b42320d5cc7d6d2e567f883120120323102228"
+      "link":"http://www.kuvva.com/wallpapers/e86ce5b9b42320d5cc7d6d2e567f883120120323102228",
+      "classes": "light color"
    },
    {
       "author":"Jakub Polomski",
@@ -297,6 +205,7 @@
          "http://www.kuvva.com/wallpapers/60ae163c5044462574df7f71e111196220120120121942/sizes/1920x1080.jpeg?md=1",
          "http://www.kuvva.com/wallpapers/60ae163c5044462574df7f71e111196220120120121942/sizes/2560x1600.jpeg?md=1"
       ],
-      "link":"http://www.kuvva.com/wallpapers/60ae163c5044462574df7f71e111196220120120121942"
+      "link":"http://www.kuvva.com/wallpapers/60ae163c5044462574df7f71e111196220120120121942",
+      "classes": "light more_shadow"
    }
 ]
