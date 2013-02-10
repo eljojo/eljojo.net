@@ -19,19 +19,23 @@
 	<meta name="viewport" content = "width=850,height=device-height, initial-scale = 0.55, minimum-scale = 0.55, maximum-scale = 1.5" />  
 	<link rel="shortcut icon" href="yo.png" />
 	
-	<script type="text/javascript" charset="utf-8" src="http://zeptojs.com/zepto.js"></script>
+	<script type="text/javascript" charset="utf-8" src="http://cdnjs.cloudflare.com/ajax/libs/zepto/1.0rc1/zepto.min.js"></script>
 	<script type="text/javascript" charset="utf-8">
 	function shuffle(o){ //v1.0
 	    for(var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
 	    return o;
 	};
 	$(function(){
-		$.getJSON('wallpapers.json', function(wallpapers) {
-			wallpaper = shuffle(wallpapers)[0]
-			image = wallpaper.link.split('/')[4]
-			$('body').css('background-image', "url(backgrounds/2560x1600_" + image + "1.jpeg)")
-			console.log(image)
-			$('body').addClass(wallpaper.classes)
+		var wallpapers = []
+		var update_wallpaper = function() {
+			var wallpaper = shuffle(wallpapers)[0]
+			$('body')
+				.css('background-image', "url(backgrounds/2560x1600_" + wallpaper.link.split('/')[4] + "1.jpeg)")
+				.attr('class', wallpaper.classes)
+		}
+		$.getJSON('wallpapers.json', function(list) {
+			wallpapers = list;
+			update_wallpaper()
 		})
 	})
 	</script>
