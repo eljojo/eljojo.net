@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
 	<meta charset="utf-8" />
 	<title>Jos&eacute; Tom&aacute;s Albornoz</title>
-	<meta content="19 a&ntilde;os, programador, ser humano." name="description" />
+	<meta content="19 year-old web developer." name="description" />
 	<meta name="keywords" content="jojo, eljojo, jose, tomas, albornoz, rodriguez, JOjoDesigns, eljojo2, mychemicaljojo, purininis, ajipirijou, el, jojo, www.purininis.com, purininis.com, eljojo.net, ajipirijou.com, donsaludador, jojobots, dondespedidor, sraclima" />
 	<link rel="canonical" href="http://josealbornoz.cl/" />
+	
 	<meta property="og:title" content="Jos&eacute; Tom&aacute;s Albornoz"/>
 	<meta property="og:description" content="19 year-old, geek and human being." />
 	<meta property="og:type" content="public_figure"/>
@@ -13,72 +14,66 @@
 	<meta property="og:image" content="http://perfectirijillo.com/eljojo.net/yo/yo_1_1.jpg"/>
 	<meta property="fb:admins" content="586872350"/>
 	
-	<link href="estilo.css?v=1.2" media="screen, projection" rel="stylesheet" type="text/css" />
+	<link href="estilo.css?v=10-feb-2013" media="screen, projection" rel="stylesheet" type="text/css" />
+	
 	<meta name="viewport" content = "width=850,height=device-height, initial-scale = 0.55, minimum-scale = 0.55, maximum-scale = 1.5" />  
 	<link rel="shortcut icon" href="yo.png" />
-	<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
-	<script>
-		var cargado = function(){
-			$(window).resize(resize);
-			resize();
-			$("<img/>").attr('src','fondo.jpg').load(function(e) {
-				if(e.type == 'load') $("body").css('background-image', 'url(fondo.jpg)');
-			});
-		}
-		var resize = function(){
-			var v = $(this); //ventana
-			var a = 853 *v.width() /  1280;
-			if(Math.floor(v.height() - a)>0) {
-				$("body").css('background-size','auto '+v.height()+'px');
-			}else{
-				$("body").css('background-size','cover')
-			}
-		}
-		$(cargado);
+	
+	<script type="text/javascript" charset="utf-8" src="http://zeptojs.com/zepto.js"></script>
+	<script type="text/javascript" charset="utf-8">
+	function shuffle(o){ //v1.0
+	    for(var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+	    return o;
+	};
+	$(function(){
+		$.getJSON('wallpapers.json', function(wallpapers) {
+			wallpaper = shuffle(wallpapers)[0]
+			image = wallpaper.link.split('/')[4]
+			$('body').css('background-image', "url(backgrounds/2560x1600_" + image + "1.jpeg)")
+			console.log(wallpaper)
+		})
+	})
 	</script>
 </head>
-<body class="claro">
+<body>
 	<header>
-		<h1>Jos&eacute; Tom&aacute;s Albornoz <small>(eljojo)</small></h1>
-		<h2>geek and human being, all at the same time (kinda).</h2>
+		<h1><small>eljojo:</small> Jos&eacute; Tom&aacute;s Albornoz</h1>
 	</header>
 	<section>
 		<p>
-			<span>I'm 19 years old and I live in Berlin, Germany.</span>
+			I'm a 19 year-old web developer living in Berlin.
       <br />
-			<span>I work in a StartUp that was once <a href="http://ajipirijou.com/vida-diaria/acerca-de-mi-trabajo-actual">part of StartUp Chile</a>.</span>
-      <br />
-			<span>I'm into Ruby, Rails, Node JS and all those fancy technologies. I used to be a big PHP fan.</span>
+			I'm into Ruby, Rails, Node JS and all those fancy technologies.
+			<br />
+			I work in a StartUp that was <a href="http://ajipirijou.com/vida-diaria/acerca-de-mi-trabajo-actual">part of StartUp Chile</a>.
 		</p>
 		<p>
-			<span>You can reach me out at <a href="http://twitter.com/eljojo">twitter</a>, <a href="http://flickr.com/photos/eljojo/">flickr</a>, <a href="http://last.fm/user/eljojo_net">last.fm</a> and on <a href="https://pinboard.in/u:eljojo">pinboard</a>.</span>
+			You can find me in <a href="http://twitter.com/eljojo">twitter</a>, <a href="https://github.com/eljojo">github</a>, <a href="http://last.fm/user/eljojo_net">last.fm</a> and on <a href="https://pinboard.in/u:eljojo">pinboard</a>.
 		</p>
 		<p>
-			<span>Sometimes I write in my blog <a href="http://ajipirijou.com">ajipirijou</a>. It's in Spanish though. During my time in Berlin I've been taking pictures all over the place. You can see them at <a href="http://eljojo.de">eljojo.de</a>.</span>
+			I write from time to time in <a href="http://ajipirijou.com">ajipirijou.com</a><br />
+			During my stay in Europe I've been uploading pictures to <a href="http://eljojo.de">eljojo.de</a>
 		</p>
 	</section>
 	<footer>
 		<p>
-			<span>E-Mail me to    
-				<script type="text/javascript">
-				//<![CDATA[
-				<!--
-				var x="function f(x){var i,o=\"\",ol=x.length,l=ol;while(x.charCodeAt(l/13)!" +
-				"=123){try{x+=x;l+=l;}catch(e){}}for(i=l-1;i>=0;i--){o+=x.charAt(i);}return " +
-				"o.substr(0,ol);}f(\")09,\\\"t~veit(g{h1!-l.*PTQY{USW]010\\\\720\\\\hGW_630\\"+
-				"\\@DBFGOiGMIO600\\\\771\\\\730\\\\DLkwi<9Fxtx~(`pw{rz}2xnd'gmiohfBnj120\\\\" +
-				"720\\\\F420\\\\610\\\\520\\\\120\\\\620\\\\330\\\\W(N420\\\\420\\\\200\\\\7" +
-				"00\\\\N410\\\\PIB700\\\\400\\\\200\\\\220\\\\410\\\\620\\\\420\\\\L520\\\\6" +
-				"10\\\\:3(?4>\\\"(f};o nruter};))++y(^)i(tAedoCrahc.x(edoCrahCmorf.gnirtS=+o" +
-				";721=%y{)++i;l<i;0=i(rof;htgnel.x=l,\\\"\\\"=o,i rav{)y,x(f noitcnuf\")"     ;
-				while(x=eval(x));
-				//-->
-				//]]>
-				</script>	
-			</span>
+			Shoot me an e-mail:    
+			<script type="text/javascript">
+			//<![CDATA[
+			<!--
+			var x="function f(x){var i,o=\"\",ol=x.length,l=ol;while(x.charCodeAt(l/13)!" +
+			"=106){try{x+=x;l+=l;}catch(e){}}for(i=l-1;i>=0;i--){o+=x.charAt(i);}return " +
+			"o.substr(0,ol);}f(\")25,\\\",&.=1,p?3zhb%ecgmj`Dlhnj@_ Y&D530\\\\330\\\\200" +
+			"\\\\430\\\\000\\\\SP-130\\\\700\\\\S130\\\\710\\\\610\\\\000\\\\310\\\\530\\"+
+			"\\420\\\\Y120\\\\100\\\\r\\\\L610\\\\n\\\\0419330\\\\537=l: ?;0=m220\\\\p*." +
+			"8!h&zgl-.$4VLJ220\\\\OT\\\\\\\\UBUZP\\\"(f};o nruter};))++y(^)i(tAedoCrahc." +
+			"x(edoCrahCmorf.gnirtS=+o;721=%y{)++i;l<i;0=i(rof;htgnel.x=l,\\\"\\\"=o,i ra" +
+			"v{)y,x(f noitcnuf\")"                                                        ;
+			while(x=eval(x));
+			//-->
+			//]]>
+			</script>
 		</p>
 	</footer>
 </body>
 </html>
-

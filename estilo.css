@@ -1,91 +1,59 @@
-@import url(http://fonts.googleapis.com/css?family=Cookie|Salsa|Quattrocento); /*|Buda:300*/
+@import url(http://fonts.googleapis.com/css?family=Salsa|Quattrocento);
 body {
-	color:#2C2C2C;
-	font-family: 'Quattrocento', serif;
-	font-size:1em;
-	background-attachment: scroll;
-    background-clip: border-box;
-    background-color: transparent;
-    background-image: url("fondo3.jpg");
-    background-origin: padding-box;
-    background-position: 0 0;
-    background-repeat: repeat;
-    background-size: cover;
-	text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
-	width:800px;
+	color: #333333;
+	width: 570px;
 	margin: 0 auto;
+  padding: 0 10px;
+	font-family: 'Quattrocento', serif;
+	font-size: 1.2em;
+	background-attachment: scroll;
+  background-clip: border-box;
+  background-color: transparent;
+  background-origin: padding-box;
+  background-position: 0 0;
+  background-repeat: repeat;
+  background-size: cover;
+	text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
 }
-
-::-moz-selection { background: #CC9944; color: #fff; text-shadow: none; }
-::selection { background: #CC9944; color: #fff; text-shadow: none; }
 
 h1 {
 	font-family: 'Salsa', cursive;
-	font-size:2.5em;
-	margin-bottom:0;
-}
-small {
-	color: #474747;
-    font-size: 0.4em;
-}
-h2 {
-	margin-top:0;
-	font-family: 'Cookie', cursive;
-	font-weight:normal;
-	margin-left:0.5em;
 	font-size:2em;
-	color: #667722;
+	margin-bottom:0;
+  margin-left: -60px;
 }
-footer {
-	/*font-family: 'Buda', sans-serif;*/
-	font-size:1.2em;
+
+small {
+  font-size: 0.4em;
 }
+
 a, a:visited{
-	color: #242424;
-	text-decoration:underline;
-}
-a:hover {
+	color: #000;
 	text-decoration: none;
-	/*color: #FF6517;*/
 }
-section {
-	font-size:1.1em;
+
+a:hover {
+	text-decoration: underline;
 }
+
+
 span {
-	background: none repeat scroll 0 0 #CC9944;
 	color: #113300;
 	text-shadow:none;
 	padding:5px;
   line-height: 30px;
 }
+
 @media screen and (max-device-width: 480px){
 	body{
 		background-size: auto 800px;
 	}
 }
-/* oscuro */
-body.oscuro span{
-	background: none repeat scroll 0 0 #CC9944;
-	color: #113300;
+
+
+/*body {
+  background-image: url("backgrounds/2560x1600_b9dab2da1ecbb9ac605b9d3fb8e38121201110280759441.jpeg");
 }
-body.oscuro a, body.oscuro a:visited {
-	color: #242424;
-	text-decoration:underline;
-}
-body.oscuro a:hover{
-	text-decoration: none;
-	color: #242424;
-}
-/* claro */
-body.claro span{
-	background: none repeat scroll 0 0 #667722;
-	color: #ffddbb;
-}
-body.claro a, body.claro a:visited {
-	color: #ddccbb;
-	text-decoration: underline;
-}
-body.claro a:hover{
-	text-decoration: none;
-	color: #AACC44;
-}
+*/
+::-moz-selection { background: #D81313; color: #fff; text-shadow: none; }
+::selection { background: #D81313; color: #fff; text-shadow: none; }
