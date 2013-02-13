@@ -14,7 +14,7 @@
 	<meta property="og:image" content="http://perfectirijillo.com/eljojo.net/yo/yo_1_1.jpg"/>
 	<meta property="fb:admins" content="586872350"/>
 	
-	<link href="estilo.css?v=10-feb-2013" media="screen, projection" rel="stylesheet" type="text/css" />
+	<link href="estilo.css?v=13-feb-2013" media="screen, projection" rel="stylesheet" type="text/css" />
 	
 	<meta name="viewport" content = "width=850,height=device-height, initial-scale = 0.55, minimum-scale = 0.55, maximum-scale = 1.5" />  
 	<link rel="shortcut icon" href="yo.png" />
@@ -26,16 +26,22 @@
 	    return o;
 	};
 	$(function(){
-		var wallpapers = []
-		var update_wallpaper = function() {
-			var wallpaper = shuffle(wallpapers)[0]
+		$.getJSON('wallpapers.json', function(wallpapers) {
+			var wallpaper 		= shuffle(wallpapers)[0],
+					wallpaper_url = "2560x1600_" + wallpaper.link.split('/')[4] + "1.jpeg"
 			$('body')
-				.css('background-image', "url(backgrounds/2560x1600_" + wallpaper.link.split('/')[4] + "1.jpeg)")
-				.attr('class', wallpaper.classes)
-		}
-		$.getJSON('wallpapers.json', function(list) {
-			wallpapers = list;
-			update_wallpaper()
+				.css('background-image', "url(backgrounds/non_retina/" + wallpaper_url + ")")
+				.attr('class', wallpaper.classes);
+			$('#wallpaper_credits').show().find('a').attr('href', wallpaper.link).text(wallpaper.author)
+			if (window.devicePixelRatio > 1) {
+				console.log('retina')
+				$("<img/>").attr('src', "backgrounds/non_retina/" + wallpaper_url).bind('load', function(e) {
+					console.log(e)
+					if(e.type == 'load') {
+						$("body").css('background-image', "url(backgrounds/" + wallpaper_url + ")");
+					}
+				});
+			}
 		})
 	})
 	</script>
@@ -80,5 +86,8 @@
 			</script>
 		</p>
 	</footer>
+	<div id="wallpaper_credits">
+		wallpaper by <a href="http://eljojo.net">jojo</a>
+	</div>
 </body>
 </html>

@@ -74,3 +74,19 @@ body.more_shadow.light {
 
 ::-moz-selection { background: #D81313; color: #fff; text-shadow: none; }
 ::selection { background: #D81313; color: #fff; text-shadow: none; }
+
+#wallpaper_credits {
+  position: fixed;
+  bottom: 0px;
+  right: 0px;
+  text-shadow: none !important;
+  color: #fff;
+  background: rgba(0,0,0, 0.5);
+  padding: 5px;
+  font-size: 15px;
+  display: none;
+}
+#wallpaper_credits a, #wallpaper_credits a:visited {
+  text-decoration: underline;
+  color: white;
+}
