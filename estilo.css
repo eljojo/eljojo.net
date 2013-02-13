@@ -36,10 +36,24 @@ a:hover {
 	text-decoration: underline;
 }
 
-@media screen and (max-device-width: 480px){
-	body{
-		background-size: auto 800px;
+@media screen and (max-device-width: 480px) {
+	body {
+		width: 90%;
+    margin-top: 20px;
 	}
+  header h1{
+    font-size: 1.5em;
+    margin: 0;
+  }
+  header small{
+    display: none;
+  }
+  p {
+    line-height: 1.5em;
+  }
+  footer {
+    margin-bottom: 30px;
+  }
 }
 
 body.light {
