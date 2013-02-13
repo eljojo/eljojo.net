@@ -30,8 +30,7 @@
 				.attr('class', wallpaper.classes);
 			$('#wallpaper_credits').show().find('a').attr('href', wallpaper.link).text(wallpaper.author)
 			if (window.devicePixelRatio > 1) {
-				console.log('retina')
-				$("<img/>").attr('src', "backgrounds/non_retina/" + wallpaper_url).bind('load', function(e) {
+				$("<img/>").attr('src', "backgrounds/" + wallpaper_url).bind('load', function(e) {
 					console.log(e)
 					if(e.type == 'load') {
 						$("body").css('background-image', "url(backgrounds/" + wallpaper_url + ")");
