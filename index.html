@@ -28,7 +28,7 @@
 			$('body')
 				.css('background-image', "url(backgrounds/non_retina/" + wallpaper_url + ")")
 				.attr('class', wallpaper.classes);
-			$('#wallpaper_credits').show().find('a').attr('href', wallpaper.link).text(wallpaper.author)
+			$('#wallpaper_credits').show().find('a').attr('href', wallpaper.website || wallpaper.link).text(wallpaper.author)
 			if (window.devicePixelRatio > 1) {
 				$("<img/>").attr('src', "backgrounds/" + wallpaper_url).bind('load', function(e) {
 					console.log(e)

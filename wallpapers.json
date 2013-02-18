@@ -2,6 +2,7 @@
    {
       "author":"MiraRuido",
       "link":"http://www.kuvva.com/wallpapers/11f0913720d78321cfe68b0da6d7010620120413050117",
+      "website": "http://miraruido.com",
       "classes": ""
    },
    {
@@ -12,7 +13,8 @@
    {
       "author":"Carlos Alberto",
       "link":"http://www.kuvva.com/wallpapers/dc42f2b22987f90f83a30a96c4b62e2920120909115637",
-      "classes": ""
+      "classes": "",
+      "website": "http://www.carlosalbertophoto.com"
    },
    {
       "author":"Ian Stevenson",
@@ -27,7 +29,8 @@
    {
       "author":"Gabriel Diaz",
       "link":"http://www.kuvva.com/wallpapers/93b71c1007ee80f0e3717cb1433ad04520121116150407",
-      "classes": "light"
+      "classes": "light",
+      "website": "http://www.gabrieldiazphotography.com"
    },
    {
       "author":"Turnislefthome",
@@ -42,12 +45,8 @@
    {
       "author":"Gabriel Diaz",
       "link":"http://www.kuvva.com/wallpapers/3aca517c93d9716411947c64eda7c93220111027083819",
-      "classes": "light"
-   },
-   {
-      "author":"Oliver Jeffers",
-      "link":"http://www.kuvva.com/wallpapers/2a4e72c954f2258b2e1b65de6ce5471220110902031629",
-      "classes": ""
+      "classes": "light",
+      "website": "http://www.gabrieldiazphotography.com"
    },
    {
       "author":"Art Lasovsky",
@@ -57,11 +56,6 @@
    {
       "author":"Cody Cobb",
       "link":"http://www.kuvva.com/wallpapers/d135a26e6cfec0c80079ce0cdf23f1ce20120713184919",
-      "classes": ""
-   },
-   {
-      "author":"Karol Lasia",
-      "link":"http://www.kuvva.com/wallpapers/8816da63ba42821f28cd43232672f68620120503145541",
       "classes": ""
    },
    {
@@ -77,7 +71,8 @@
    {
       "author":"Gabriel Diaz",
       "link":"http://www.kuvva.com/wallpapers/3f8c5f60a424b1bff202cf50bd5a44b620111027083243",
-      "classes": ""
+      "classes": "",
+      "website": "http://www.gabrieldiazphotography.com"
    },
    {
       "author":"Markus Reugels",
@@ -92,6 +87,7 @@
    {
       "author":"Jakub Polomski",
       "link":"http://www.kuvva.com/wallpapers/60ae163c5044462574df7f71e111196220120120121942",
-      "classes": "light more_shadow"
+      "classes": "light more_shadow",
+      "website": "http://www.jakubpolomski.com"
    }
 ]
