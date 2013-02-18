@@ -22,7 +22,7 @@
 	    return o;
 	};
 	$(function(){
-		$.getJSON('wallpapers.json', function(wallpapers) {
+		$.getJSON('wallpapers.json?18-feb-2013', function(wallpapers) {
 			var wallpaper 		= shuffle(wallpapers)[0],
 					wallpaper_url = "2560x1600_" + wallpaper.link.split('/')[4] + "1.jpeg"
 			$('body')
