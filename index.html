@@ -3,16 +3,16 @@
 <head>
 	<meta charset="utf-8" />
 	<title>Jos&eacute; Tom&aacute;s Albornoz</title>
-	<meta content="19 year-old web developer." name="description" />
+	<meta content="web developer, fan of useless things." name="description" />
 	<meta name="keywords" content="jojo, eljojo, jose, tomas, albornoz, rodriguez, JOjoDesigns, eljojo2, mychemicaljojo, purininis, ajipirijou, el, jojo, www.purininis.com, purininis.com, eljojo.net, ajipirijou.com, donsaludador, jojobots, dondespedidor, sraclima" />
 	<link rel="canonical" href="http://josealbornoz.cl/" />
 	<meta property="og:title" content="Jos&eacute; Tom&aacute;s Albornoz"/>
-	<meta property="og:description" content="19 year-old web developer living in Berlin." />
+	<meta property="og:description" content="web developer, fan of useless things." />
 	<meta property="og:type" content="public_figure"/>
 	<meta property="og:url" content="http://josealbornoz.cl/"/>
 	<meta property="og:image" content="http://eljojo.net/yo_1_1.jpg"/>
 	<meta property="fb:admins" content="586872350"/>
-	<link href="estilo.css?v=13-feb-2013" media="screen, projection" rel="stylesheet" type="text/css" />
+	<link href="estilo.css?v=29-abr-2013" media="screen, projection" rel="stylesheet" type="text/css" />
 	<meta name="viewport" content = "width=device-width, initial-scale=1.0" />  
 	<link rel="shortcut icon" href="yo.png" />
 	<script type="text/javascript" charset="utf-8" src="http://cdnjs.cloudflare.com/ajax/libs/zepto/1.0rc1/zepto.min.js"></script>
@@ -29,14 +29,11 @@
 				.css('background-image', "url(backgrounds/non_retina/" + wallpaper_url + ")")
 				.attr('class', wallpaper.classes);
 			$('#wallpaper_credits').show().find('a').attr('href', wallpaper.website || wallpaper.link).text(wallpaper.author)
-			if (window.devicePixelRatio > 1) {
-				$("<img/>").attr('src', "backgrounds/" + wallpaper_url).bind('load', function(e) {
-					console.log(e)
-					if(e.type == 'load') {
+			if (window.devicePixelRatio > 1)
+				$('\<img>').attr('src', "backgrounds/" + wallpaper_url).bind('load', function(e) {
+					if(e.type == 'load')
 						$("body").css('background-image', "url(backgrounds/" + wallpaper_url + ")");
-					}
 				});
-			}
 		})
 	})
 	</script>
@@ -46,19 +43,18 @@
 		<h1><small>eljojo:</small> Jos&eacute; Tom&aacute;s Albornoz</h1>
 	</header>
 	<section>
-		<p>
-			I'm a 19 year-old chilean web developer living in Berlin.
-      <br />
-			I'm into Ruby, Rails, Node JS and all those fancy technologies.
-			<br />
-			I work in a StartUp that was <a href="http://ajipirijou.com/vida-diaria/acerca-de-mi-trabajo-actual">part of StartUp Chile</a>.
-		</p>
+		<ul>
+			<li>I'm a chilean web developer living in Berlin.</li>
+			<li class="small">I work in a startup so small that doesn't even have a name.</li>
+			<li>I'm into Ruby, Rails and friends.</li>
+			<li>I pay attention to the details that nobody cares about.</li>
+		</ul>
 		<p>
 			You can find me in <a href="http://twitter.com/eljojo">twitter</a>, <a href="https://github.com/eljojo">github</a>, <a href="http://last.fm/user/eljojo_net">last.fm</a> and on <a href="https://pinboard.in/u:eljojo">pinboard</a>.
 		</p>
 		<p>
-			I write from time to time in <a href="http://ajipirijou.com">ajipirijou.com</a><br />
-			During my stay in Europe I've been uploading pictures to <a href="http://eljojo.de">eljojo.de</a>
+			From time to time I write some stuff in <a href="http://ajipirijou.com">ajipirijou.com</a>,<br />
+			during my stay in Europe I've been uploading pictures to <a href="http://eljojo.de">eljojo.de</a>
 		</p>
 	</section>
 	<footer>

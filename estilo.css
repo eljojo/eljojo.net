@@ -1,4 +1,16 @@
-@import url(http://fonts.googleapis.com/css?family=Salsa|Quattrocento);
+@font-face {
+  font-family: 'Quattrocento';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Quattrocento'), url(http://themes.googleusercontent.com/static/fonts/quattrocento/v4/WZDISdyil4HsmirlOdBRFKRDOzjiPcYnFooOUGCOsRk.woff) format('woff');
+}
+@font-face {
+  font-family: 'Salsa';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Salsa-Regular'), url(http://themes.googleusercontent.com/static/fonts/salsa/v3/eK4_lJSug9bPTBAtqaZ4GKCWcynf_cDxXwCLxiixG1c.woff) format('woff');
+}
+
 body {
 	color: #333333;
 	width: 570px;
@@ -25,6 +37,18 @@ h1 {
 
 small {
   font-size: 0.4em;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+li {
+  margin-bottom: 5px;
+  line-height: 20px;
+}
+li.small {
+  font-size: 0.5em;
 }
 
 a, a:visited{
@@ -66,11 +90,11 @@ body.light a, body.light a:visited{
 	text-decoration: none;
 }
 
-body.color p {
+body.color p, body.color li {
   background: rgba(216, 19, 19, 0.8);
 }
 
-body.color.light p {
+body.color.light p, body.color.light li {
   text-shadow: none;
 }
 
