@@ -4,35 +4,28 @@
   font-weight: 400;
   src: local('Quattrocento'), url(http://themes.googleusercontent.com/static/fonts/quattrocento/v4/WZDISdyil4HsmirlOdBRFKRDOzjiPcYnFooOUGCOsRk.woff) format('woff');
 }
-@font-face {
-  font-family: 'Salsa';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Salsa-Regular'), url(http://themes.googleusercontent.com/static/fonts/salsa/v3/eK4_lJSug9bPTBAtqaZ4GKCWcynf_cDxXwCLxiixG1c.woff) format('woff');
-}
 
 body {
 	color: #333333;
 	width: 570px;
-	margin: 0 auto;
   padding: 0 10px;
-	font-family: 'Quattrocento', serif;
-	font-size: 1.2em;
+	font-family: 'Quattrocento', sans-serif;
+	font-size: 20px;
+  background: url('backgrounds/marrakesh.jpg');
 	background-attachment: scroll;
   background-clip: border-box;
   background-color: transparent;
   background-origin: padding-box;
-  background-position: 0 0;
-  background-repeat: repeat;
+  background-repeat: no-repeat;
   background-size: cover;
 	text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 h1 {
-	font-family: 'Salsa', cursive;
-	font-size: 2em;
-	margin-bottom: 0;
-  margin-left: -60px;
+  font-family: "Helvetica Neue";
+  font-weight: lighter;
+  font-size: 2em;
+  margin-bottom: 0;
 }
 
 small {
@@ -52,79 +45,46 @@ li.small {
 }
 
 a, a:visited{
-	color: #000;
-	text-decoration: none;
-}
-
-a:hover {
+	color: #333;
 	text-decoration: underline;
 }
 
-@media screen and (max-device-width: 480px) {
-	body {
-		width: 90%;
-    margin-top: 20px;
-	}
-  header h1{
-    font-size: 1.5em;
-    margin: 0;
-  }
-  header small{
-    display: none;
-  }
-  p {
-    line-height: 1.5em;
-  }
-  footer {
-    margin-bottom: 30px;
-  }
-}
-
-body.light {
-  color: #fafafa;
-  text-shadow: 1px 1px 0 rgba(0, 0, 0, 1);
-}
-
-body.light a, body.light a:visited{
-	color: #fff;
+a:hover {
 	text-decoration: none;
 }
 
-body.color p, body.color li {
-  background: rgba(216, 19, 19, 0.8);
+@media screen and (max-width: 900px) {
+	body {
+    width: 90%;
+    margin: 0 auto;
+    background-repeat: no-repeat;
+    background-position-y: 100%;
+    background-size: contain;
+    padding-bottom: 250px;
+	}
+  header h1{
+    font-size: 33px
+  }
 }
 
-body.color.light p, body.color.light li {
-  text-shadow: none;
+@media screen and (max-width: 1000px) and (min-width: 481px) {
+	body {
+		width: 55%;
+    min-width: 370px;
+    margin-left: 0;
+	}
+  header h1{
+    font-size: 38px
+  }
 }
 
-body.dark_header h1 {
-  color: #333333 !important;
-  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5) !important;
-}
-
-body.more_shadow {
-  text-shadow: 2px 2px 0 rgba(255, 255, 255, 0.5);
-}
-body.more_shadow.light {
-  text-shadow: 2px 2px 0 rgba(0, 0, 0, 1);
+@media
+(-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
+  body {
+    background-image: url('backgrounds/marrakesh_retina.jpg');
+  }
 }
 
 ::-moz-selection { background: #D81313; color: #fff; text-shadow: none; }
 ::selection { background: #D81313; color: #fff; text-shadow: none; }
-
-#wallpaper_credits {
-  position: fixed;
-  bottom: 0px;
-  right: 0px;
-  text-shadow: none !important;
-  color: #fff;
-  background: rgba(0,0,0, 0.5);
-  padding: 5px;
-  font-size: 15px;
-  display: none;
-}
-#wallpaper_credits a, #wallpaper_credits a:visited {
-  text-decoration: underline;
-  color: white;
-}

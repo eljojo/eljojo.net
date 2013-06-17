@@ -12,42 +12,20 @@
 	<meta property="og:url" content="http://josealbornoz.cl/"/>
 	<meta property="og:image" content="http://eljojo.net/yo_1_1.jpg"/>
 	<meta property="fb:admins" content="586872350"/>
-	<link href="estilo.css?v=29-abr-2013" media="screen, projection" rel="stylesheet" type="text/css" />
-	<meta name="viewport" content = "width=device-width, initial-scale=1.0" />  
+	<link href="estilo.css?v=17-jun-2013" media="screen, projection" rel="stylesheet" type="text/css" />
+	<meta name="viewport" content = "width=device-width, initial-scale=1.0" />
 	<link rel="shortcut icon" href="yo.png" />
-	<script type="text/javascript" charset="utf-8" src="http://cdnjs.cloudflare.com/ajax/libs/zepto/1.0rc1/zepto.min.js"></script>
-	<script type="text/javascript" charset="utf-8">
-	function shuffle(o){ //v1.0
-	    for(var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
-	    return o;
-	};
-	$(function(){
-		$.getJSON('wallpapers.json?18-feb-2013', function(wallpapers) {
-			var wallpaper 		= shuffle(wallpapers)[0],
-					wallpaper_url = "2560x1600_" + wallpaper.link.split('/')[4] + "1.jpeg"
-			$('body')
-				.css('background-image', "url(backgrounds/non_retina/" + wallpaper_url + ")")
-				.attr('class', wallpaper.classes);
-			$('#wallpaper_credits').show().find('a').attr('href', wallpaper.website || wallpaper.link).text(wallpaper.author)
-			if (window.devicePixelRatio > 1)
-				$('\<img>').attr('src', "backgrounds/" + wallpaper_url).bind('load', function(e) {
-					if(e.type == 'load')
-						$("body").css('background-image', "url(backgrounds/" + wallpaper_url + ")");
-				});
-		})
-	})
-	</script>
 </head>
 <body>
 	<header>
-		<h1><small>eljojo:</small> Jos&eacute; Tom&aacute;s Albornoz</h1>
+		<h1 title="eljojo">Jos&eacute; Tom&aacute;s Albornoz</h1>
 	</header>
 	<section>
 		<ul>
 			<li>I'm a chilean web developer living in Berlin.</li>
 			<li class="small">I work in a startup so small that doesn't even have a name.</li>
 			<li>I'm into Ruby, Rails and friends.</li>
-			<li>I pay attention to the details that nobody cares about.</li>
+			<li>I pay attention to the details nobody cares about.</li>
 		</ul>
 		<p>
 			You can find me in <a href="http://twitter.com/eljojo">twitter</a>, <a href="https://github.com/eljojo">github</a>, <a href="http://last.fm/user/eljojo_net">last.fm</a> and on <a href="https://pinboard.in/u:eljojo">pinboard</a>.
@@ -59,7 +37,7 @@
 	</section>
 	<footer>
 		<p>
-			Shoot me an e-mail:    
+			Shoot me an e-mail:
 			<script type="text/javascript">
 			//<![CDATA[
 			<!--
@@ -77,8 +55,5 @@
 			</script>
 		</p>
 	</footer>
-	<div id="wallpaper_credits">
-		wallpaper by <a href="http://eljojo.net">jojo</a>
-	</div>
 </body>
 </html>
