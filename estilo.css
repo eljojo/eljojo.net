@@ -69,7 +69,6 @@ a:hover {
 
 @media screen and (max-width: 1000px) and (min-width: 481px) {
   body {
-    width: 55%;
     min-width: 370px;
     margin-left: 0;
   }
