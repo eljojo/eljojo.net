@@ -1,20 +1,20 @@
 @import url(http://fonts.googleapis.com/css?family=Muli:300);
 
 body {
-	color: #333333;
-	width: 570px;
+  color: #333333;
+  width: 570px;
   padding: 0 10px;
-	font-family: 'Muli', sans-serif;
+  font-family: 'Muli', sans-serif;
   font-weight: 300;
-	font-size: 20px;
+  font-size: 20px;
   background: url('backgrounds/marrakesh.jpg');
-	background-attachment: scroll;
+  background-attachment: scroll;
   background-clip: border-box;
   background-color: transparent;
   background-origin: padding-box;
   background-repeat: no-repeat;
   background-size: cover;
-	text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 h1 {
@@ -40,34 +40,34 @@ li.small {
 }
 
 a, a:visited{
-	color: #333;
-	text-decoration: underline;
+  color: #333;
+  text-decoration: underline;
 }
 
 a:hover {
-	text-decoration: none;
+  text-decoration: none;
 }
 
 @media screen and (max-width: 900px) {
-	body {
+  body {
     width: 90%;
     margin: 0 auto;
     background-repeat: no-repeat;
     background-position-y: 100%;
     background-size: contain;
     padding-bottom: 250px;
-	}
+  }
   header h1{
     font-size: 33px
   }
 }
 
 @media screen and (max-width: 1000px) and (min-width: 481px) {
-	body {
-		width: 55%;
+  body {
+    width: 55%;
     min-width: 370px;
     margin-left: 0;
-	}
+  }
   header h1{
     font-size: 38px
   }
