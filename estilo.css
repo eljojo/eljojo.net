@@ -1,5 +1,9 @@
 @import url(http://fonts.googleapis.com/css?family=Muli:300);
 
+html {
+  height: 100%;
+}
+
 body {
   color: #333333;
   width: 570px;
@@ -14,6 +18,7 @@ body {
   background-origin: padding-box;
   background-repeat: no-repeat;
   background-size: cover;
+  background-position-x: center;
   text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
 }
 
