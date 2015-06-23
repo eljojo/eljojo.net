@@ -6,7 +6,7 @@ html {
 
 body {
   color: #333333;
-  width: 570px;
+  width: 630px;
   padding: 0 10px;
   font-family: 'Muli', sans-serif;
   font-weight: 300;
@@ -85,5 +85,5 @@ a:hover {
   }
 }
 
-::-moz-selection { background: #D81313; color: #fff; text-shadow: none; }
-::selection { background: #D81313; color: #fff; text-shadow: none; }
+::-moz-selection { background: #269CDC; color: #fff; text-shadow: none; }
+::selection { background: #269CDC; color: #fff; text-shadow: none; }
