@@ -1,7 +1,6 @@
 eljojo.net
 ==========
-this is the repo I have for my website.
-the files are since 2010-11 aprox. really not sure.
+This repo hosts my personal website, eljojo.net.
 
-this is for personal use, though you're welcome to fork it or whatever.
-if you find this useful let me know.
+This repository is meant mostly for educational purposes.
+Please do not use it as-is.
