@@ -43,8 +43,13 @@ a, a:visited{
   text-decoration: none;
 }
 
+a.always-underline {
+  border-bottom: 1px solid #666;
+}
+
 a:hover {
   text-decoration: underline;
+  border-bottom: 0;
 }
 
 /* background adjustments */
@@ -83,7 +88,7 @@ a:hover {
 /* text adjustments */
 @media screen and (max-width: 1024px) {
   a, a:visited{
-    text-decoration: underline;
+    border-bottom: 1px solid #666;
   }
 }
 @media screen and (max-width: 600px) and (min-width: 351px) {
