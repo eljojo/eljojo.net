@@ -1,0 +1,22 @@
+image: ruby:2.5.1-slim
+# based on https://github.com/shadyoak/s3_website/blob/40c139145f32020ebbf7acbadece8403ede32e4c/Dockerfile
+
+variables:
+  LC_ALL: C.UTF-8
+  LANG: en_US.UTF-8
+  LANGUAGE: en_US.UTF-8
+  S3_WEBSITE_VERSION: 3.4.0
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - vendor/ruby
+
+before_script:
+  - apt-get update -qq && apt-get install -y --no-install-recommends openjdk-8-jre-headless
+  - gem install s3_website #-v ${S3_WEBSITE_VERSION}
+  - mkdir /app
+  - s3_website install
+
+script:
+  - bundle exec s3_website push
