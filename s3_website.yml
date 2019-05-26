@@ -24,6 +24,7 @@ exclude_from_upload:
   - README\.md
   - Gemfile.*
   - .gitlab-ci.yml
+  - vendor/
 
 # s3_reduced_redundancy: true
 
