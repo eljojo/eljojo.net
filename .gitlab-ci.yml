@@ -18,5 +18,6 @@ before_script:
   - mkdir /app
   - s3_website install
 
-script:
-  - bundle exec s3_website push
+publish:
+  script:
+    - bundle exec s3_website push
