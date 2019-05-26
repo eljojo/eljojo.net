@@ -3,15 +3,7 @@ s3_secret: <%= ENV['S3_SECRET'] %>
 s3_bucket: <%= ENV['S3_BUCKET'] %>
 s3_endpoint: <%= ENV['S3_ENDPOINT'] %>
 
-# Below are examples of all the available configurations.
-# See README for more detailed info on each of them.
-
 site: ./
-
-max_age:
-  "backgrounds/*": 6000
-  "estilo.css": 6000
-  "*": 300
 
 gzip:
   - .html
@@ -24,10 +16,6 @@ gzip:
 
 # ignore_on_server: that_folder_of_stuff_i_dont_keep_locally
 
-# exclude_from_upload:
-#   - those_folders_of_stuff
-#   - i_wouldnt_want_to_upload
-
 exclude_from_upload:
   - \.git
   - s3_website\.yml
@@ -35,6 +23,7 @@ exclude_from_upload:
   - publish\.sh
   - README\.md
   - Gemfile.*
+  - .gitlab-ci.yml
 
 # s3_reduced_redundancy: true
 
@@ -42,7 +31,7 @@ cloudfront_distribution_id: <%= ENV['CLOUDFRONT_DISTRIBUTION_ID'] %>
 
 cloudfront_distribution_config:
   default_cache_behavior:
-    min_TTL: <%= 60 * 60 * 24 %>
+    min_TTL: <%= 60 * 60 * 24 * 7 %>
   aliases:
     quantity: 6
     items:
