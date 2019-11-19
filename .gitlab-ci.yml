@@ -1,0 +1,20 @@
+image: ruby:2.5.1-slim
+# based on https://github.com/shadyoak/s3_website/blob/40c139145f32020ebbf7acbadece8403ede32e4c/Dockerfile
+
+variables:
+  LC_ALL: C.UTF-8
+  LANG: en_US.UTF-8
+  LANGUAGE: en_US.UTF-8
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - vendor/ruby
+
+before_script:
+  - apt-get update -qq && apt-get install -y --no-install-recommends openjdk-8-jre-headless
+
+publish:
+  script:
+    - bundle install --deployment --without development test -j $(nproc) --path vendor/ruby
+    - bundle exec s3_website push

@@ -15,7 +15,7 @@ body {
   font-size: 21px;
   text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
 
-  background: url('/backgrounds/2016_high.jpg');
+  background: url('backgrounds/2016_high.jpg');
   background-attachment: scroll;
   background-color: white;
   background-repeat: no-repeat;
@@ -69,6 +69,7 @@ a:hover {
   body {
     background-size: contain;
     background-position: center bottom;
+    min-height: 45em;
   }
 }
 
@@ -108,14 +109,6 @@ a:hover {
     font-size: 1.5em;
   }
 }
-
-/* @media */
-/* (-webkit-min-device-pixel-ratio: 2), */
-/* (min-resolution: 192dpi) { */
-/*   body { */
-/*     background-image: url('backgrounds/marrakesh_retina.jpg'); */
-/*   } */
-/* } */
 
 ::-moz-selection { background: #FF6517; color: #fff; text-shadow: none; }
 ::selection { background: #FF6517; color: #fff; text-shadow: none; }
