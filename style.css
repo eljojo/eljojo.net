@@ -7,13 +7,17 @@ body {
   width: 100%;
   height: 100vh;
 
-  padding: 0 20px;
+  padding: 0;
 
   background: #f9f9f9;
   color: #333333;
   font-family: 'Helvetica Neue', Helvetica, sans-serif;
   font-weight: 300;
   font-size: 21px;
+}
+
+.main {
+  padding: 0 20px;
 }
 
 h1 {
@@ -56,7 +60,7 @@ a:hover {
   }
   .image {
     flex: 3;
-    padding-top: 5em;
+    padding: 5em 20px;
   }
 }
 
@@ -83,6 +87,8 @@ a:hover {
 @media screen and (max-width: 350px) {
   body {
     font-size: 17px;
+  }
+  .main {
     padding: 0 10px;
   }
   header h1{
@@ -90,8 +96,8 @@ a:hover {
   }
 }
 
-::-moz-selection { background: #FF6517; color: #fff; text-shadow: none; }
-::selection { background: #FF6517; color: #fff; text-shadow: none; }
+::-moz-selection { background: #28bbff; color: #fff; text-shadow: none; }
+::selection { background: #28bbff; color: #fff; text-shadow: none; }
 
 .image img {
   width: 100%;
