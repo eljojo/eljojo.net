@@ -9,18 +9,12 @@ body {
 
   padding: 0 20px;
 
+  background: #f9f9f9;
   color: #333333;
   font-family: 'Helvetica Neue', Helvetica, sans-serif;
   font-weight: 300;
   font-size: 21px;
   text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
-
-  background: url('backgrounds/2019.jpg');
-  background-attachment: scroll;
-  background-color: white;
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: right bottom;
 }
 
 h1 {
@@ -53,36 +47,23 @@ a:hover {
 }
 
 /* background adjustments */
-@media screen and (max-width: 1200px) and (min-width: 1051px) {
-  body {
-    background-size: auto 85%;
-    background-position: 115% bottom;
+
+@media screen and (min-width: 800px) {
+  .container {
+    display: flex;
   }
-}
-@media screen and (max-width: 1050px) and (min-width: 801px) {
-  body {
-    background-size: auto 80%;
-    background-position: 120% bottom;
+  .main {
+    flex: 5;
   }
-}
-@media screen and (max-width: 800px) {
-  body {
-    background-size: contain;
-    background-position: center bottom;
-    min-height: 49em;
+  .image {
+    flex: 3;
+    padding-top: 5em;
   }
 }
 
 @media screen and (max-height: 370px)  {
   body {
     height: 100%;
-  }
-}
-@media screen and (max-height: 500px) and (max-width: 800px) {
-  body {
-    padding-bottom: 280px !important; /* ugh */
-    height: 100%;
-    background-size: 350px auto;
   }
 }
 
@@ -112,3 +93,8 @@ a:hover {
 
 ::-moz-selection { background: #FF6517; color: #fff; text-shadow: none; }
 ::selection { background: #FF6517; color: #fff; text-shadow: none; }
+
+.image img {
+  width: 100%;
+  height: auto;
+}
