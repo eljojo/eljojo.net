@@ -34,14 +34,16 @@ cloudfront_distribution_config:
   default_cache_behavior:
     min_TTL: <%= 60 * 60 * 24 * 7 %>
   aliases:
-    quantity: 6
+    quantity: 8
     items:
       CNAME0: eljojo.net
-      CNAME1: www.eljojo.net
+      CNAME1: eljojo.me
       CNAME2: josealbornoz.cl
-      CNAME3: www.josealbornoz.cl
-      CNAME4: eljojo.me
+      CNAME3: eljojo.ca
+      CNAME4: www.eljojo.net
       CNAME5: www.eljojo.me
+      CNAME6: www.josealbornoz.cl
+      CNAME7: www.eljojo.ca
 
 cloudfront_invalidate_root: true
 cloudfront_wildcard_invalidation: true
