@@ -42,12 +42,13 @@ a, a:visited{
 }
 
 a.always-underline {
-  border-bottom: 1px solid #666;
+  text-decoration: underline;
+  border-bottom: 0;
 }
 
 a:hover {
-  text-decoration: underline;
-  border-bottom: 0;
+  border-bottom: 1px solid #666;
+  text-decoration: none;
 }
 
 /* background adjustments */
