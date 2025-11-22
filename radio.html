@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Jojo Radio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      background: #050509;
+      color: #f5f5f7;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .player {
+      background: radial-gradient(circle at top left, #1b263b 0, #050509 55%);
+      border-radius: 1.5rem;
+      padding: 1.5rem 1.5rem 1.2rem;
+      max-width: 420px;
+      width: 100%;
+      box-shadow:
+        0 18px 35px rgba(0,0,0,0.6),
+        0 0 0 1px rgba(255,255,255,0.02);
+    }
+
+    .player-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.75rem;
+    }
+
+    .title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+
+    .subtitle {
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+
+    .status {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.75;
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 0.55rem;
+      height: 0.55rem;
+      border-radius: 999px;
+      margin-right: 0.4rem;
+      background: #555;
+    }
+
+    .status-dot.playing {
+      background: #3ddc84;
+      box-shadow: 0 0 6px rgba(61,220,132,0.9);
+    }
+
+    .status-dot.connecting {
+      background: #f5a623;
+    }
+
+    .status-dot.offline {
+      background: #ff3b30;
+    }
+
+    .controls-row {
+      margin-top: 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .primary-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex: 1;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      background: none;
+      color: inherit;
+      font: inherit;
+    }
+
+    .btn-icon {
+      width: 3rem;
+      height: 3rem;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.1);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.35);
+      backdrop-filter: blur(16px);
+      transition: transform 0.1s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    .btn-icon:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.16);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.45);
+    }
+
+    .btn-icon:active {
+      transform: translateY(1px) scale(0.97);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+
+    .btn-icon svg {
+      width: 1.3rem;
+      height: 1.3rem;
+    }
+
+    .btn-small {
+      width: 2.4rem;
+      height: 2.4rem;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.2);
+      backdrop-filter: blur(12px);
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+
+    .btn-small:hover {
+      background: rgba(255,255,255,0.12);
+      transform: translateY(-1px);
+    }
+
+    .btn-small svg {
+      width: 1.1rem;
+      height: 1.1rem;
+    }
+
+    .volume-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      min-width: 0;
+    }
+
+    .volume-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.14);
+      outline: none;
+    }
+
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 0 10px rgba(255,255,255,0.4);
+      cursor: pointer;
+      margin-top: -5px;
+    }
+
+    .volume-slider::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 0 10px rgba(255,255,255,0.4);
+      cursor: pointer;
+    }
+
+    .volume-slider::-moz-range-track {
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.14);
+    }
+
+    .hint-row {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      font-size: 0.72rem;
+      opacity: 0.65;
+      flex-wrap: wrap;
+    }
+
+    .kbd {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.1rem 0.3rem;
+      border-radius: 0.35rem;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: radial-gradient(circle at top, rgba(255,255,255,0.15), rgba(0,0,0,0.35));
+      box-shadow: 0 1px 0 rgba(255,255,255,0.15);
+      font-size: 0.65rem;
+      margin: 0 0.1rem;
+    }
+
+    a.stream-link {
+      color: inherit;
+      opacity: 0.7;
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(255,255,255,0.25);
+    }
+
+    a.stream-link:hover {
+      opacity: 1;
+      border-bottom-style: solid;
+    }
+
+    @media (max-width: 480px) {
+      .player {
+        padding: 1.2rem 1.1rem 1rem;
+        border-radius: 1.1rem;
+      }
+
+      .controls-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .primary-controls {
+        justify-content: center;
+      }
+
+      .hint-row {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="player" role="region" aria-label="Jojo Radio Player">
+    <div class="player-header">
+      <div>
+        <div class="title">Jojo Radio</div>
+        <div class="subtitle">
+          Stream:
+          <a class="stream-link" href="https://giss.tv:666/jojoradio.mp3" target="_blank" rel="noopener noreferrer">
+            jojoradio.mp3
+          </a>
+        </div>
+      </div>
+      <div class="status" id="status">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">Idle</span>
+      </div>
+    </div>
+
+    <div class="controls-row">
+      <div class="primary-controls">
+        <button
+          id="playPauseBtn"
+          class="btn-icon"
+          aria-label="Play"
+        >
+          <!-- Play icon (triangle) -->
+          <svg id="playIcon" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z" fill="currentColor"></path>
+          </svg>
+          <!-- Pause icon (two bars), hidden initially -->
+          <svg id="pauseIcon" viewBox="0 0 24 24" style="display:none;">
+            <path d="M6 5h4v14H6zM14 5h4v14h-4z" fill="currentColor"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="volume-wrapper">
+        <button
+          id="muteBtn"
+          class="btn-small"
+          aria-label="Mute or unmute"
+        >
+          <!-- Speaker icon -->
+          <svg id="volumeIcon" viewBox="0 0 24 24">
+            <path d="M3 10v4h4l5 5V5L7 10H3z" fill="currentColor"></path>
+          </svg>
+        </button>
+        <input
+          id="volumeSlider"
+          class="volume-slider"
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value="0.8"
+          aria-label="Volume"
+        />
+      </div>
+    </div>
+
+    <div class="hint-row" aria-hidden="true">
+      <div>
+        Keyboard:
+        <span class="kbd">Space</span> play / pause
+        <span class="kbd">↑</span><span class="kbd">↓</span> volume
+        <span class="kbd">M</span> mute
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const STREAM_URL = "https://giss.tv:666/jojoradio.mp3";
+      const STORAGE_KEY_VOLUME = "jojoradio-volume";
+
+      const audio = new Audio();
+      audio.preload = "none";
+      audio.playsInline = true;
+
+      const playPauseBtn = document.getElementById("playPauseBtn");
+      const playIcon = document.getElementById("playIcon");
+      const pauseIcon = document.getElementById("pauseIcon");
+      const muteBtn = document.getElementById("muteBtn");
+      const volumeIcon = document.getElementById("volumeIcon");
+      const volumeSlider = document.getElementById("volumeSlider");
+      const statusDot = document.getElementById("statusDot");
+      const statusText = document.getElementById("statusText");
+
+      let shouldBePlaying = false; // whether we want the stream connected (for retries)
+      let uiIsPlaying = false;     // whether the UI shows "playing" (pause icon)
+      let isUserMuted = false;
+      let retryTimeoutId = null;
+      let retryDelayMs = 5000;   // start at 5s
+      const retryDelayMaxMs = 30000; // cap at 30s
+
+      // Load volume from storage
+      try {
+        const storedVolume = localStorage.getItem(STORAGE_KEY_VOLUME);
+        if (storedVolume !== null) {
+          const vol = Math.min(1, Math.max(0, parseFloat(storedVolume)));
+          audio.volume = vol;
+          volumeSlider.value = vol.toString();
+        } else {
+          audio.volume = parseFloat(volumeSlider.value);
+        }
+      } catch (e) {
+        audio.volume = parseFloat(volumeSlider.value);
+      }
+
+      function setStatus(state, message) {
+        // state: "idle" | "connecting" | "playing" | "offline"
+        statusDot.classList.remove("playing", "connecting", "offline");
+
+        switch (state) {
+          case "playing":
+            statusDot.classList.add("playing");
+            break;
+          case "connecting":
+            statusDot.classList.add("connecting");
+            break;
+          case "offline":
+            statusDot.classList.add("offline");
+            break;
+          default:
+            // idle
+            break;
+        }
+
+        statusText.textContent = message;
+      }
+
+      function updatePlayPauseUI(isPlaying) {
+        if (isPlaying) {
+          playIcon.style.display = "none";
+          pauseIcon.style.display = "block";
+          playPauseBtn.setAttribute("aria-label", "Pause");
+        } else {
+          playIcon.style.display = "block";
+          pauseIcon.style.display = "none";
+          playPauseBtn.setAttribute("aria-label", "Play");
+        }
+      }
+
+      function updateMuteUI() {
+        if (audio.muted || audio.volume === 0) {
+          volumeIcon.innerHTML = '<path d="M3 10v4h4l5 5V5L7 10H3zM16 8.59 14.59 10 16 11.41 17.41 10 16 8.59zM18.59 6 17.17 7.41 18.76 9 17.17 10.59 18.59 12 21 9.59 18.59 7.17 21 4.76z" fill="currentColor"></path>';
+        } else {
+          volumeIcon.innerHTML = '<path d="M3 10v4h4l5 5V5L7 10H3zM16 12c0-1.77-1.02-3.29-2.5-4.03v8.06A4.49 4.49 0 0 0 16 12zM18.5 12c0 3.04-1.71 5.64-4.26 6.93l-.24.12v-2.2c1.54-1.09 2.5-2.9 2.5-4.85s-.96-3.76-2.5-4.85V5.0l.24.12A7.49 7.49 0 0 1 18.5 12z" fill="currentColor"></path>';
+        }
+      }
+
+      function clearRetryTimer() {
+        if (retryTimeoutId !== null) {
+          clearTimeout(retryTimeoutId);
+          retryTimeoutId = null;
+        }
+      }
+
+      function scheduleRetry() {
+        clearRetryTimer();
+        if (!shouldBePlaying) return;
+
+        setStatus("offline", `The Radio is Offline`);
+        retryTimeoutId = setTimeout(() => {
+          if (!shouldBePlaying) return;
+          startPlayback(true);
+          retryDelayMs = Math.min(retryDelayMs * 1.6, retryDelayMaxMs);
+        }, retryDelayMs);
+      }
+
+      function resetRetryDelay() {
+        retryDelayMs = 5000;
+      }
+
+      function startPlayback(isRetry = false) {
+        shouldBePlaying = true;
+        clearRetryTimer();
+
+        const src = isRetry
+          ? `${STREAM_URL}?t=${Date.now()}`
+          : STREAM_URL;
+
+        audio.src = src;
+        audio.load();
+
+        setStatus("connecting", isRetry ? "Reconnecting…" : "Connecting…");
+
+        audio.play()
+          .then(() => {
+            resetRetryDelay();
+            setStatus("playing", "Live");
+            updatePlayPauseUI(uiIsPlaying);
+          })
+          .catch((err) => {
+            console.warn("Playback error:", err);
+            if (!shouldBePlaying) return;
+            scheduleRetry();
+            updatePlayPauseUI(uiIsPlaying);
+          });
+      }
+
+      function stopPlayback() {
+        shouldBePlaying = false;
+        clearRetryTimer();
+        audio.pause();
+        setStatus("idle", "Paused");
+        updatePlayPauseUI(false);
+      }
+
+      // --- Auto-connect on load, muted ---
+      function startBackgroundConnectionMuted() {
+        uiIsPlaying = false;          // UI still shows "Play"
+        audio.muted = true;
+        isUserMuted = true;
+        updateMuteUI();
+        startPlayback(false);
+      }
+
+      // Event wiring
+      playPauseBtn.addEventListener("click", () => {
+        if (!uiIsPlaying) {
+          // User wants to hear the stream
+          uiIsPlaying = true;
+          shouldBePlaying = true;
+
+          // Restore audio volume state
+          audio.muted = false;
+          isUserMuted = false;
+          updateMuteUI();
+          updatePlayPauseUI(true);
+
+          // If audio is paused (e.g., after a manual pause or iOS stopping it),
+          // explicitly resume. If there's no src, start from scratch.
+          if (!audio.src) {
+            startPlayback(false);
+          } else if (audio.paused) {
+            setStatus("connecting", "Connecting…");
+            audio.play()
+              .then(() => {
+                setStatus("playing", "Live");
+              })
+              .catch((err) => {
+                console.warn("Resume error, retrying:", err);
+                startPlayback(true);
+              });
+          }
+          // If audio is already playing (background muted connection),
+          // this click just unmutes & updates UI.
+        } else {
+          // User pauses the stream completely
+          uiIsPlaying = false;
+          stopPlayback();
+        }
+      });
+
+      muteBtn.addEventListener("click", () => {
+        if (audio.muted || audio.volume === 0) {
+          // unmute
+          audio.muted = false;
+          isUserMuted = false;
+          if (audio.volume === 0) {
+            audio.volume = 0.5;
+            volumeSlider.value = "0.5";
+            try {
+              localStorage.setItem(STORAGE_KEY_VOLUME, "0.5");
+            } catch (e) {}
+          }
+        } else {
+          // mute
+          audio.muted = true;
+          isUserMuted = true;
+        }
+        updateMuteUI();
+      });
+
+      volumeSlider.addEventListener("input", (e) => {
+        const value = parseFloat(e.target.value);
+        audio.volume = value;
+        if (value > 0) {
+          audio.muted = false;
+          isUserMuted = false;
+        }
+        updateMuteUI();
+        try {
+          localStorage.setItem(STORAGE_KEY_VOLUME, value.toString());
+        } catch (e) {}
+      });
+
+      audio.addEventListener("playing", () => {
+        setStatus("playing", "Live");
+        resetRetryDelay();
+        updatePlayPauseUI(uiIsPlaying);
+      });
+
+      audio.addEventListener("pause", () => {
+        if (!shouldBePlaying) return;
+        // Unexpected pause while we think it should be playing → try to recover.
+        scheduleRetry();
+        updatePlayPauseUI(uiIsPlaying);
+      });
+
+      audio.addEventListener("error", () => {
+        if (!shouldBePlaying) return;
+        scheduleRetry();
+        updatePlayPauseUI(uiIsPlaying);
+      });
+
+      audio.addEventListener("stalled", () => {
+        if (!shouldBePlaying) return;
+        setStatus("connecting", "Reconnecting…");
+      });
+
+      // Keyboard shortcuts
+      document.addEventListener("keydown", (e) => {
+        const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : "";
+        if (tag === "input" || tag === "textarea") return;
+
+        if (e.code === "Space") {
+          e.preventDefault();
+          playPauseBtn.click();
+        } else if (e.code === "ArrowUp") {
+          e.preventDefault();
+          const step = 0.05;
+          let vol = Math.min(1, audio.volume + step);
+          audio.volume = vol;
+          volumeSlider.value = vol.toString();
+          if (vol > 0) {
+            audio.muted = false;
+            isUserMuted = false;
+          }
+          updateMuteUI();
+          try {
+            localStorage.setItem(STORAGE_KEY_VOLUME, vol.toString());
+          } catch (e) {}
+        } else if (e.code === "ArrowDown") {
+          e.preventDefault();
+          const step = 0.05;
+          let vol = Math.max(0, audio.volume - step);
+          audio.volume = vol;
+          volumeSlider.value = vol.toString();
+          if (vol === 0) {
+            audio.muted = true;
+            isUserMuted = true;
+          }
+          updateMuteUI();
+          try {
+            localStorage.setItem(STORAGE_KEY_VOLUME, vol.toString());
+          } catch (e) {}
+        } else if (e.key === "m" || e.key === "M") {
+          e.preventDefault();
+          muteBtn.click();
+        }
+      });
+
+      // Initial UI
+      setStatus("idle", "Idle");
+      updatePlayPauseUI(false);
+      updateMuteUI();
+
+      // Start background connection immediately (muted)
+      startBackgroundConnectionMuted();
+    })();
+  </script>
+</body>
+</html>
