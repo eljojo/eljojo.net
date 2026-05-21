@@ -215,13 +215,21 @@
     // sun and casts a thin sliver. As wind wiggles each leaf, its
     // shadow PHYSICALLY CHANGES SHAPE — this is what makes the gaps
     // between shadows open and close, which is what makes the light
-    // through those gaps flicker. There is no alpha-based "fade" here;
-    // the shape change IS the mechanism. The wiggle amplitude is scaled
-    // by WIND.activity so zero wind ⇒ leaves still ⇒ canopy static.
-    wiggleAmpMax:     1.0,     // rad — max tilt angle at full wind (~57°)
+    // through those gaps flicker.
+    //
+    // Gating model: scintillation is always running, but only a
+    // SUBSET of leaves is wiggling at any given moment. Each leaf has
+    // its own slow "availability" sinusoid (random freq + phase per
+    // leaf); a leaf wiggles only when its availability is above the
+    // threshold (1 − 2·activity). At zero wind the threshold is 1,
+    // nothing crosses, no leaves wiggle. At full wind the threshold
+    // is −1, everything is above, all leaves wiggle. In between, the
+    // fraction wiggling scales with wind, and which leaves are in the
+    // wiggling subset rotates continuously through the canopy.
+    wiggleAmpMax:     1.05,    // rad — peak wiggle angle when active (~60°)
     wiggleFreqMin:    1.5,     // Hz — slowest leaves
     wiggleFreqMax:    5.5,     // Hz — fastest leaves
-    wiggleWindPower:  1.6,     // >1 = subtle breeze stays calm, gust really pops
+    wiggleWindPower:  1.4,     // >1 = subtle breeze stays calm, gust really pops
 
     // gap-shaped reveal — additive warm light layer driven by the
     // inverse of the per-frame density field, upscaled with smoothing.
@@ -315,6 +323,16 @@
   const TREE_PITCH_RANGE    = [-0.05, 0.55];
   const LEAF_MIN_DEPTH      = 4;
   const LEAF_POS_JITTER_Z   = 10;
+
+  /* Per-leaf availability sinusoid — slow, randomized per leaf. The
+     leaf is "available to wiggle" when sin(t·availFreq + availPhase)
+     exceeds the activity-driven threshold. Frequencies are low (sub-
+     second to a couple of seconds) so each leaf's wiggle events last
+     ~0.5–3 seconds at moderate activity. AVAIL_RAMP smooths the
+     entry/exit of the wiggle window so leaves don't pop on/off. */
+  const AVAIL_FREQ_MIN = 0.15;  // Hz — slow leaves swap in/out of wiggling
+  const AVAIL_FREQ_MAX = 0.65;
+  const AVAIL_RAMP     = 0.30;  // smooth window above threshold for fade-in/out
 
   /* ──────────────────────── 3D LAYER SYSTEM ─────────────────────────────
      This is THE mechanism that produces moiré. Each leaf is bound at
@@ -410,14 +428,22 @@
       pos: [x + jx, y + jy, Math.max(20, z + jz)],
       layer: 0,  // assigned later, after layers are built
       // Orientation: stem direction (a 2D angle in the ground plane —
-      // the axis around which this leaf rotates), plus a baseTilt (rest
-      // tilt at zero wind, slight per-leaf variation so leaves don't
-      // all look identical) and a wiggle phase+freq driving the
-      // per-leaf rotation around the stem axis in the wind.
+      // the axis around which this leaf rotates), plus a baseTilt
+      // (rest tilt at zero wind, slight per-leaf variation so leaves
+      // don't look identical) and a fast wiggle phase+freq driving
+      // the actual oscillation when the leaf IS wiggling.
       stemAngle:    rng() * Math.PI * 2,
       baseTilt:     (rng() - 0.5) * 0.25,   // ±~7° rest tilt
       wigglePhase:  rng() * Math.PI * 2,
       wiggleFreq:   PARAMS.wiggleFreqMin + rng() * (PARAMS.wiggleFreqMax - PARAMS.wiggleFreqMin),
+      // Availability: each leaf has its own slow sinusoid that gates
+      // whether it's currently in a "wiggling" event. With random
+      // per-leaf availFreq + availPhase, the subset of leaves that
+      // happen to be available at any moment rotates continuously
+      // through the canopy. The threshold this signal must cross is
+      // set by WIND.activity (see leafTilt).
+      availPhase:   rng() * Math.PI * 2,
+      availFreq:    AVAIL_FREQ_MIN + rng() * (AVAIL_FREQ_MAX - AVAIL_FREQ_MIN),
     };
   }
 
@@ -824,19 +850,40 @@
     ];
   }
 
-  /* Per-leaf tilt angle in radians at time t. baseTilt is the rest
-     orientation; the wiggle oscillates around it at this leaf's own
-     phase + frequency, with amplitude scaled by WIND.activity. At
-     activity = 0 a leaf is frozen at its baseTilt (no motion). At
-     activity = 1 it sweeps ±wiggleAmpMax. The tilt is the angle
-     between the leaf's face-normal and the sun-aligned "broad-face
-     on" direction; the leaf's projected shadow squashes by |cos(tilt)|
-     perpendicular to the stem. */
+  /* Per-leaf tilt angle in radians at time t. Two-stage model:
+
+     1. AVAILABILITY GATE — each leaf's slow sinusoid must be above
+        the wind-driven threshold (1 − 2·activity) for the leaf to be
+        in a "wiggling" event. At zero wind the threshold is 1 and no
+        leaf is ever above it (nothing wiggles). At full wind the
+        threshold is −1 and every leaf is always above (everything
+        wiggles). In between, the FRACTION of leaves currently
+        wiggling scales with activity. Random per-leaf availFreq +
+        availPhase means which leaves are in the wiggling subset
+        rotates continuously through the canopy.
+
+     2. WIGGLE — when in the wiggle window, the leaf rotates at its
+        own fast frequency with full wiggleAmpMax amplitude. The
+        amplitude is NOT scaled by activity directly: a wiggling leaf
+        wiggles the same regardless of wind strength. What scales
+        with wind is the COUNT of currently-wiggling leaves and the
+        DURATION of each wiggle event.
+
+     AVAIL_RAMP smooths the entry/exit so leaves fade into and out of
+     wiggling rather than popping. */
   function leafTilt(leaf, t) {
     const activity = WIND.activity;
     if (activity <= 0) return leaf.baseTilt;
+
+    const avail = Math.sin(t * 0.001 * leaf.availFreq * 2 * Math.PI + leaf.availPhase);
+    const threshold = 1 - 2 * activity;
+    if (avail <= threshold) return leaf.baseTilt;
+
+    const aboveBy = avail - threshold;
+    const gate = aboveBy >= AVAIL_RAMP ? 1 : aboveBy / AVAIL_RAMP;
+
     const w = Math.sin(t * 0.001 * leaf.wiggleFreq * 2 * Math.PI + leaf.wigglePhase);
-    return leaf.baseTilt + w * PARAMS.wiggleAmpMax * activity;
+    return leaf.baseTilt + w * PARAMS.wiggleAmpMax * gate;
   }
 
   /* Stamp every leaf's CURRENT projected position into the density
