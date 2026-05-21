@@ -45,31 +45,53 @@
    onto the viewport. The viewport IS the ground we look at. There is no
    camera — projection is a simple shear by z.
 
-   The crucial mechanism for the moiré-like flicker is the 3D LAYER
-   system. Every leaf is assigned at scene-build time to one of N discrete
-   height-layers. At render time each layer translates as a coherent slab
-   — every leaf in layer k gets the SAME offset at time t. Different
-   layers have different drift functions (two-octave sinusoids,
-   randomized per layer). The interference between projected layers
-   sliding past each other on the ground plane IS the moiré. Random
-   per-leaf jitter would give noise; coherent layers give real
-   interference. ("it's almost as if i had two paper grids ...
-   move opposite directions.")
+   Motion has TWO timescales, and the visible flicker is their sum:
 
-   Bulk wind, separately, shifts EVERY leaf and branch coherently — that
-   produces the "the whole field shifts right together when a gust comes
-   through" feeling. Gusts ramp and decay on long-ish time scales.
+     SLOW (sub-Hz): the 3D LAYER system. Every leaf is assigned at
+     scene-build time to one of N discrete height-layers. At render
+     time each layer translates as a coherent slab — every leaf in
+     layer k gets the SAME offset at time t. Different layers have
+     different drift functions (two-octave sinusoids, randomized per
+     layer). The interference between projected layers sliding past
+     each other on the ground plane IS the moiré. Random per-leaf
+     position jitter would give noise; coherent layers give real
+     interference. ("it's almost as if i had two paper grids ... move
+     opposite directions.") Bulk wind on top shifts EVERY leaf and
+     branch coherently — gusts surge the whole canopy.
 
-   On top of all that, the LIGHT RAYS are painted LAST, above the
-   canopy. They have fixed positions in the world (rays don't drift —
-   they ARE the projected images of the sun, which doesn't move on
-   the timescale of a breeze). Each ray's brightness is modulated by
-   a per-frame DENSITY FIELD computed from the current leaf positions:
-   rays brighten where the canopy is sparse (a gap is overhead) and
-   vanish where it's dense. As layer drift makes gaps open and close
-   at each spot on the ground, every ray winks on and off IN PLACE —
-   the literal physical mechanism for "tiny gaps between leaves let
-   rays of light through that flicker in and out."
+     FAST (~3–8 Hz): per-leaf SCINTILLATION, GATED BY WIND. Each leaf
+     has its own phase + frequency. At each render step the leaf's
+     shadow alpha AND its contribution to the density field are dimmed
+     by the same factor — the leaf is mostly "broad-face on" (full
+     shadow), and briefly goes "edge-on" (much less shadow). The DEPTH
+     of the dip is scaled by WIND.activity (derived from base + gust
+     magnitude), so:
+       zero wind        → activity 0 → static canopy, no flicker
+       subtle breeze    → low activity → shallow flicker
+       gust             → activity 1 → full-depth flicker + bulk shift
+     Without this gating the canopy flickered constantly; with it the
+     flicker breathes with the wind, which is what real canopy light
+     does. PARAMS.scintWindPower shapes the response curve.
+
+   Light comes through the canopy via TWO complementary mechanisms:
+
+     GAP-SHAPED REVEAL (the dominant "shaped light"): an additive
+     warm-light pass over the canvas masked by the INVERSE of the
+     density field, upscaled with smoothing. Bright patches naturally
+     inherit the SHAPE of the gap between leaves — irregular, soft,
+     sometimes large, sometimes small — rather than being round dots.
+     This matches a real spring canopy where gaps are bigger than a
+     true pinhole and what you see on the ground is the shape of the
+     gap, not the shape of the sun.
+
+     PINHOLE RAYS (the brightest "specular" highlights): fixed-
+     position bright spots drawn LAST, each STRETCHED along the
+     projected sun vector with per-ray aspect, rotation jitter, and
+     slow angle wobble — so they read as beams of light, not dots.
+     Each ray's alpha is modulated by (1 − density)^p sampled from
+     the density field at its position, so a ray only lights up when
+     a real gap is overhead. As layer drift + scintillation make the
+     gap pattern shift, rays wink in and out IN PLACE.
 
    ┌──────────────────────────────────────────────────────────────────────┐
    │  ART DIRECTION                                                       │
@@ -85,35 +107,64 @@
    Interaction: "Fully passive — runs on its own, like real weather."
 
    ┌──────────────────────────────────────────────────────────────────────┐
-   │  OPEN ITERATION NOTE FOR FUTURE AIs                                  │
+   │  HISTORY: WHAT JOSÉ ASKED FOR AND WHAT GOT BUILT                     │
    └──────────────────────────────────────────────────────────────────────┘
 
-   José's latest unresolved feedback, AT THE TIME OF WRITING:
+   Earlier feedback that drove this version of the file:
 
-     "in the answer above you articulated what i said correctly, but the
-      rendered still doesn't quite reflect the effect of lights of ray
-      coming through, it looks like dots moving to the side. can you
-      revisit the file and fix it? please focus carefully on my lived
-      experience"
+     "in the answer above you articulated what i said correctly, but
+      the rendered still doesn't quite reflect the effect of lights of
+      ray coming through, it looks like dots moving to the side."
 
-  ideas:
+     "i'm wondering how to recreate that pinhole like effect ... the
+      ground was lit by the light that was pinning thru the leaves in
+      the tree above me, imagine the flickering that would happen if
+      you put many sheets of paper with holes in them next to a light,
+      that's what it felt like in real life, a flickering"
 
-     - Directional ray streaks biased along the sun vector. Real
-       sun-images through a wind-blown canopy have a smeared,
-       directional character — not isotropic dots. (Still TODO.)
+   What got built in response:
 
-     - Compute, per frame, an actual canopy-density field by sampling
-       projected leaf positions; modulate each ray's alpha by the
-       INVERSE of the local density, so rays really do read out of the
-       gaps. (DONE — see the DENSITY FIELD block in the render
-       section. Rays are now drawn LAST, on top of the canopy, and
-       only light up where the density buffer reads "gap" at this
-       frame. Layer drift makes the gap pattern change over time, so
-       rays now wink on and off in place instead of riding along as
-       translating dots. Tunable: DENSITY_DOWNSCALE for cost vs.
-       resolution, RAY_REVEAL_POWER for how "binary" the on/off feel
-       is, DENSITY_DOT_PROFILE for how sensitive each leaf is in the
-       coverage field.)
+     1. DENSITY FIELD: per-frame canopy coverage map computed by
+        stamping every leaf's current projected position into a small
+        offscreen buffer with identical wind + layer + scintillation
+        math. Used by BOTH the gap-shaped reveal and the pinhole rays.
+
+     2. GAP-SHAPED REVEAL: drawGapReveal paints (1 − density)^p as
+        additive warm light at the density buffer's resolution, then
+        drawImage-upscales it with smoothing. Bright patches naturally
+        inherit the SHAPE of the gap — the photo's "soft irregular
+        bright patches", not round dots. Tunable: PARAMS.gapRevealMult
+        (peak brightness), PARAMS.gapRevealPower (sharpness).
+
+     3. DIRECTIONAL PINHOLE RAYS: each ray is rendered with ctx.rotate
+        to the projected sun vector + per-ray angleJitter + slow
+        wobble, and drawn with anisotropic scale (aspect 1.0–
+        PARAMS.rayAspectMax). Streaks, not dots.
+
+     4. PER-LEAF SCINTILLATION: each leaf has its own phase + freq
+        (3–8 Hz by default). Each render step, both the leaf shadow
+        and its density stamp are dimmed by 1 − scintAmp·max(0,sin)^2,
+        so individual leaves briefly "go edge-on" and open micro-gaps.
+        This is the FAST flicker timescale; the slow layer drift is
+        the SLOW one. Together they give the two-timescale "blinking"
+        feel of real canopy light.
+
+   Knobs to reach for if it doesn't feel right at first paint:
+
+     - Reveal feels too uniform / not "shaped" enough:
+       raise PARAMS.gapRevealPower (sharper threshold) or drop
+       PARAMS.leafDensity (more real gaps to reveal).
+
+     - Flicker feels too slow / too still:
+       raise PARAMS.scintAmp and/or PARAMS.scintFreqMax.
+
+     - Rays look like dots, not beams:
+       raise PARAMS.rayAspectMax.
+
+     - Lower-level density-system tunables: DENSITY_DOWNSCALE
+       (resolution of the gap detection), RAY_REVEAL_POWER (binary-ness
+       of pinhole ray on/off), DENSITY_DOT_PROFILE (per-leaf
+       sensitivity in the coverage field).
 
    ┌──────────────────────────────────────────────────────────────────────┐
    │  THE DEFAULT PARAMETER SET                                           │
@@ -155,11 +206,43 @@
     gustStrengthMult: 2.20,
     gustFreqMult:     1.00,
 
-    // light rays — bright spots that flicker as leaves drift over them
+    // per-leaf fast scintillation — each leaf has a phase+freq and dims
+    // briefly as if pivoting edge-on to the sun in the breeze. This is
+    // the FAST flicker timescale (Hz), distinct from the slow layer
+    // drift (sub-Hz). scintAmp is the MAX depth of the dip (0 = no
+    // flicker, 1 = leaf fully vanishes briefly). The actual dip each
+    // frame is scaled by WIND_ACTIVITY (a per-frame value in [0, 1]
+    // derived from base wind + gust magnitude): zero wind ⇒ no flicker
+    // (static canopy), subtle breeze ⇒ shallow flicker, gust ⇒ full
+    // depth. scintWindPower shapes that curve — higher = more contrast
+    // between "calm breeze" and "gust" flicker. Scintillation is
+    // applied to BOTH the visible shadow AND the density-field stamp
+    // so gaps actually open at fast timescales.
+    scintAmp:         0.55,
+    scintFreqMin:     2.5,     // Hz — slowest leaves
+    scintFreqMax:     8.0,     // Hz — fastest leaves
+    scintWindPower:   1.5,     // >1 = subtle wind stays calm, gust really pops
+
+    // gap-shaped reveal — additive warm light layer driven by the
+    // inverse of the per-frame density field, upscaled with smoothing.
+    // Bright patches naturally inherit the SHAPE of the gap (irregular,
+    // soft) rather than being round dots. This is the dominant "shaped
+    // light" mechanism that matches a real canopy where the gaps are
+    // bigger than a true pinhole — what you see on the ground is the
+    // shape of the gap, not the shape of the sun.
+    gapRevealMult:    0.65,    // peak additive brightness of the reveal
+    gapRevealPower:   1.6,     // sharpness of the reveal curve
+
+    // light rays — bright pinhole-disk highlights, drawn LAST on top of
+    // the gap reveal. Stretched along the sun vector so they read as
+    // beams of light, not dots. raySizeMult * rayHaloMult gives overall
+    // size; rayAspectMax is the max stretch along the sun vector
+    // (1.0 = round; 2.0 = up to 2x stretched).
     rayDensity:       2.35,
     rayBrightnessMult: 0.05,   // low core brightness; relies on size+halo for the glow
     raySizeMult:      2.70,
     rayHaloMult:      1.90,
+    rayAspectMax:     2.0,     // 1.0 = round; >1 stretches along sun vector
   };
 
   /* ──────────────────────── COLOR (CIELAB → sRGB) ────────────────────────
@@ -326,6 +409,15 @@
     return {
       pos: [x + jx, y + jy, Math.max(20, z + jz)],
       layer: 0,  // assigned later, after layers are built
+      // Per-leaf fast scintillation: phase + frequency. At render time
+      // both the visible shadow alpha and the density-field contribution
+      // are multiplied by 1 - scintAmp * max(0, sin(...))^2 — the
+      // squared-positive-lobe sharpens the dip so each leaf spends most
+      // of its cycle "broad-face on" (full shadow) and only briefly
+      // goes "edge-on" (much less shadow). The dips of thousands of
+      // leaves at different phases sum to the fast canopy-wide twinkle.
+      scintPhase: rng() * Math.PI * 2,
+      scintFreq:  PARAMS.scintFreqMin + rng() * (PARAMS.scintFreqMax - PARAMS.scintFreqMin),
     };
   }
 
@@ -458,6 +550,7 @@
     gustTarget: 0, gustPhase: 'idle',
     gustStartedAt: 0, gustDuration: 0,
     nextGustAt: 0,
+    activity: 0,  // [0, 1], per-frame "how breezy is it right now"; scales scintillation depth
   };
   const WIND_BASE_FREQ_X = 0.00045;
   const WIND_BASE_FREQ_Y = 0.00031;
@@ -505,6 +598,19 @@
         scheduleNextGust(t);
       }
     }
+
+    /* WIND.activity — drives leaf scintillation depth. Normalize the
+       current base and gust magnitudes to [0, 1] against their max
+       amplitudes, combine, and shape with scintWindPower. At true zero
+       wind (base ~ 0 and no gust) activity is 0 and leaves are
+       perfectly still; at gust peak it's 1.0 and scintillation runs at
+       full PARAMS.scintAmp depth. */
+    const baseAmpMax  = WIND_BASE_AMP   * PARAMS.bulkWindMult;
+    const gustPeakMax = GUST_MAX_PEAK_BASE * PARAMS.gustStrengthMult;
+    const baseSpeed = Math.abs(WIND.base) / Math.max(1e-6, baseAmpMax);
+    const gustSpeed = Math.abs(WIND.gust) / Math.max(1e-6, gustPeakMax);
+    const raw = Math.min(1, Math.hypot(baseSpeed, gustSpeed));
+    WIND.activity = Math.pow(raw, PARAMS.scintWindPower);
   }
 
   /* ──────────────────────── SCENE ───────────────────────────────────────
@@ -558,6 +664,14 @@
         y: (rng() - 0.5) * worldH,
         sizeJitter:   0.6  + rng() * 0.6,
         brightJitter: 0.65 + rng() * 0.45,
+        // Directional character: each ray is stretched along the sun
+        // vector by a per-ray aspect ratio, then rotated by a small
+        // per-ray jitter so the field of rays isn't perfectly aligned.
+        // wobblePhase drives a slow per-ray angle wobble at render time
+        // so the streaks aren't perfectly static between gusts.
+        aspect:       1.0 + rng() * (PARAMS.rayAspectMax - 1.0),
+        angleJitter:  (rng() - 0.5) * Math.PI * 0.18,  // ±16°
+        wobblePhase:  rng() * Math.PI * 2,
       });
     }
 
@@ -617,6 +731,19 @@
   let densityData = null;
   let densityW = 0, densityH = 0;
 
+  /* Gap-shaped reveal: a same-resolution-as-density offscreen buffer
+     that we paint each frame from (1 - density)^p, in the sunImage
+     color, then drawImage upscaled with smoothing onto the main canvas
+     using 'lighter'. Because we paint at downscaled resolution and let
+     the browser bilinearly upscale, the bright "patches" are naturally
+     soft and gap-shaped — not round dots. This is the dominant "shaped
+     light" mechanism that matches a real canopy where gaps are larger
+     than a true pinhole, so what you see on the ground is the shape of
+     the gap, not the shape of the sun. */
+  let revealCanvas = null;
+  let revealCtx = null;
+  let revealImageData = null;
+
   function setupDensity() {
     densityW = Math.max(2, Math.ceil(W / DENSITY_DOWNSCALE));
     densityH = Math.max(2, Math.ceil(H / DENSITY_DOWNSCALE));
@@ -627,6 +754,14 @@
     densityCanvas.width = densityW;
     densityCanvas.height = densityH;
     densityData = null;
+
+    if (!revealCanvas) {
+      revealCanvas = document.createElement('canvas');
+      revealCtx = revealCanvas.getContext('2d');
+    }
+    revealCanvas.width = densityW;
+    revealCanvas.height = densityH;
+    revealImageData = revealCtx.createImageData(densityW, densityH);
   }
 
   function regenerateBrushes() {
@@ -669,6 +804,21 @@
     ];
   }
 
+  /* Per-leaf scintillation factor in [1 - scintAmp, 1]. Sin gives
+     [-1, 1]; we keep only the positive lobe and square it, so each
+     leaf is "broad-face on" (factor near 1, full shadow) most of the
+     time and briefly "edge-on" (factor down, much less shadow). t is
+     ms; scintFreq is Hz. The dip is scaled by WIND.activity so a
+     dead-calm moment is truly static, a subtle breeze gives shallow
+     flicker, and a gust runs flicker at full PARAMS.scintAmp depth. */
+  function leafScint(leaf, t) {
+    const activity = WIND.activity;
+    if (activity <= 0) return 1;
+    const s = Math.sin(t * 0.001 * leaf.scintFreq * 2 * Math.PI + leaf.scintPhase);
+    const dim = s > 0 ? s * s : 0;
+    return 1 - PARAMS.scintAmp * activity * dim;
+  }
+
   /* Stamp every leaf's CURRENT projected position into the density
      buffer. Uses identical wind + layer + projection math to
      drawLeafShadow so the density field is in lockstep with what the
@@ -700,10 +850,54 @@
       const dy = sy * ds;
       if (dx < -halfSize || dx > dW + halfSize ||
           dy < -halfSize || dy > dH + halfSize) continue;
+      // Scintillation must apply HERE too (in lockstep with the visible
+      // leaf draw) so the density field actually opens up at fast
+      // timescales. Without this the field is static between drifts and
+      // neither the gap reveal nor the rays will blink.
+      dctx.globalAlpha = leafScint(leaf, t);
       dctx.drawImage(densityBrush, dx - halfSize, dy - halfSize);
     }
+    dctx.globalAlpha = 1;
 
     densityData = dctx.getImageData(0, 0, dW, dH).data;
+  }
+
+  /* Paint the gap-shaped reveal: walk the density buffer, write
+     (1 - density)^gapRevealPower as alpha in the sunImage color into
+     revealImageData, putImageData, then draw it upscaled with smoothing
+     using 'lighter'. The browser's bilinear upscale gives soft edges
+     for free, so the bright "patches" inherit the shape of the gap
+     between leaves rather than being round dots. */
+  function drawGapReveal() {
+    if (!densityData || !revealImageData) return;
+    const src = densityData;
+    const out = revealImageData.data;
+    const r = RGB.sunImage[0];
+    const g = RGB.sunImage[1];
+    const b = RGB.sunImage[2];
+    const power = PARAMS.gapRevealPower;
+    const maxA = PARAMS.gapRevealMult * 255;
+    const N = out.length;
+    for (let i = 0; i < N; i += 4) {
+      const d = src[i] * (1 / 255);
+      const gap = 1 - d;
+      const reveal = gap <= 0 ? 0 : Math.pow(gap, power);
+      out[i]     = r;
+      out[i + 1] = g;
+      out[i + 2] = b;
+      out[i + 3] = (reveal * maxA) | 0;
+    }
+    revealCtx.putImageData(revealImageData, 0, 0);
+    const prevOp = ctx.globalCompositeOperation;
+    const prevSmoothing = ctx.imageSmoothingEnabled;
+    const prevQuality = ctx.imageSmoothingQuality;
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(revealCanvas, 0, 0, W, H);
+    ctx.globalCompositeOperation = prevOp;
+    ctx.imageSmoothingEnabled = prevSmoothing;
+    ctx.imageSmoothingQuality = prevQuality;
   }
 
   /* Light rays drawn LAST, on top of the canopy. Each ray's alpha is
@@ -716,7 +910,7 @@
      bright spots actually rise above the sunlit base, matching the
      perceptual brightness of a real pinhole sun-image vs. ambient
      ground in shade. */
-  function drawLightRays(lightRays, originX, originY) {
+  function drawLightRays(lightRays, originX, originY, t) {
     if (!densityData) return;
     const prevOp = ctx.globalCompositeOperation;
     ctx.globalCompositeOperation = 'lighter';
@@ -724,6 +918,10 @@
     const ds = 1 / DENSITY_DOWNSCALE;
     const dW = densityW, dH = densityH;
     const inv255 = 1 / 255;
+    // Base angle = the projected sun vector on the ground plane. Rays
+    // stretch along this axis so they read as beams of light, not dots.
+    const sunAngle = Math.atan2(SUN_PROJ_Y, SUN_PROJ_X);
+    const ts = t * 0.0008;  // slow per-ray wobble timescale
 
     for (let i = 0; i < lightRays.length; i++) {
       const ray = lightRays[i];
@@ -744,8 +942,18 @@
       if (reveal < 0.01) continue;
 
       const r = r0 * ray.sizeJitter;
+      const wobble = Math.sin(ts + ray.wobblePhase) * 0.12;
+      const angle = sunAngle + ray.angleJitter + wobble;
+
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
       ctx.globalAlpha = ray.brightJitter * reveal;
-      ctx.drawImage(rayBrush, x - r, y - r, r * 2, r * 2);
+      // Stretch the round brush anisotropically along the rotated x
+      // axis (= sun-vector direction): width = 2r * aspect, height = 2r.
+      const w = r * ray.aspect;
+      ctx.drawImage(rayBrush, -w, -r, w * 2, r * 2);
+      ctx.restore();
     }
     ctx.globalAlpha = 1;
     ctx.globalCompositeOperation = prevOp;
@@ -764,6 +972,9 @@
     const [sx, sy] = project(wx, wy, z, originX, originY);
     const sizeScale = 0.85 + heightFactor * 0.35;
     const r = leafBrush.width * 0.5 * sizeScale;
+    // Scintillation dims the leaf briefly as it goes edge-on. Caller
+    // resets globalAlpha after the loop.
+    ctx.globalAlpha = leafScint(leaf, t);
     ctx.drawImage(leafBrush, sx - r, sy - r, r * 2, r * 2);
   }
 
@@ -799,11 +1010,14 @@
     const { originX, originY, allBranches, allLeaves, lightRays, maxZ } = scene;
 
     const drawRays = PARAMS.rayBrightnessMult > 0 && lightRays && lightRays.length;
+    const drawReveal = PARAMS.gapRevealMult > 0;
+    const needDensity = drawRays || drawReveal;
 
-    // 1. Build the density field (offscreen). Same wind + layer math as
-    //    the leaf draw below, so the field is in lockstep with the
-    //    positions where leaves are about to paint at this t.
-    if (drawRays) {
+    // 1. Build the density field (offscreen). Same wind + layer +
+    //    scintillation math as the leaf draw below, so the field is in
+    //    lockstep with the positions and visibilities where leaves are
+    //    about to paint at this t.
+    if (needDensity) {
       buildDensityField(allLeaves, originX, originY, maxZ, t);
     }
 
@@ -815,16 +1029,29 @@
     }
 
     // 3. Leaves — the canopy. Casts the dappled shadow over the base.
+    //    drawLeafShadow sets globalAlpha per leaf for scintillation; we
+    //    reset it once at the end of the loop.
     for (let i = 0; i < allLeaves.length; i++) {
       drawLeafShadow(allLeaves[i], originX, originY, maxZ, t);
     }
+    ctx.globalAlpha = 1;
 
-    // 4. Rays — drawn LAST, on top of everything. Modulated by the
-    //    density field so they only appear in real gaps. As layers
-    //    drift, gaps shift and rays wink in and out IN PLACE rather
-    //    than translating as static dots.
+    // 4. Gap-shaped reveal — the dominant "shaped light" pass. Bright
+    //    additive warm light layer wherever the density field reads
+    //    "gap", upscaled with smoothing so the patches have natural
+    //    soft, irregular edges (matching the photo's gap-shaped light
+    //    rather than round-dot light).
+    if (drawReveal) {
+      drawGapReveal();
+    }
+
+    // 5. Pinhole rays — drawn LAST, on top of everything. Modulated by
+    //    the density field AND stretched along the sun vector so they
+    //    read as beams of light, not dots. As layers drift and leaves
+    //    scintillate, the gap pattern at each spot changes, and rays
+    //    wink in and out IN PLACE.
     if (drawRays) {
-      drawLightRays(lightRays, originX, originY);
+      drawLightRays(lightRays, originX, originY, t);
     }
   }
 
