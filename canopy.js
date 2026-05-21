@@ -60,11 +60,16 @@
    produces the "the whole field shifts right together when a gust comes
    through" feeling. Gusts ramp and decay on long-ish time scales.
 
-   On top of all that, the LIGHT RAYS layer paints fixed-position bright
-   sun-image spots on the ground BEFORE leaves are drawn. As layer drift
-   sweeps leaves across those positions, each ray flickers off (occluded)
-   and on (uncovered). That is the literal physical mechanism for "tiny
-   gaps between leaves let rays of light through that flicker in and out."
+   On top of all that, the LIGHT RAYS are painted LAST, above the
+   canopy. They have fixed positions in the world (rays don't drift —
+   they ARE the projected images of the sun, which doesn't move on
+   the timescale of a breeze). Each ray's brightness is modulated by
+   a per-frame DENSITY FIELD computed from the current leaf positions:
+   rays brighten where the canopy is sparse (a gap is overhead) and
+   vanish where it's dense. As layer drift makes gaps open and close
+   at each spot on the ground, every ray winks on and off IN PLACE —
+   the literal physical mechanism for "tiny gaps between leaves let
+   rays of light through that flicker in and out."
 
    ┌──────────────────────────────────────────────────────────────────────┐
    │  ART DIRECTION                                                       │
@@ -95,12 +100,20 @@
 
      - Directional ray streaks biased along the sun vector. Real
        sun-images through a wind-blown canopy have a smeared,
-       directional character — not isotropic dots.
+       directional character — not isotropic dots. (Still TODO.)
 
      - Compute, per frame, an actual canopy-density field by sampling
        projected leaf positions; modulate each ray's alpha by the
        INVERSE of the local density, so rays really do read out of the
-       gaps. (More expensive but physically faithful.)
+       gaps. (DONE — see the DENSITY FIELD block in the render
+       section. Rays are now drawn LAST, on top of the canopy, and
+       only light up where the density buffer reads "gap" at this
+       frame. Layer drift makes the gap pattern change over time, so
+       rays now wink on and off in place instead of riding along as
+       translating dots. Tunable: DENSITY_DOWNSCALE for cost vs.
+       resolution, RAY_REVEAL_POWER for how "binary" the on/off feel
+       is, DENSITY_DOT_PROFILE for how sensitive each leaf is in the
+       coverage field.)
 
    ┌──────────────────────────────────────────────────────────────────────┐
    │  THE DEFAULT PARAMETER SET                                           │
@@ -144,7 +157,7 @@
 
     // light rays — bright spots that flicker as leaves drift over them
     rayDensity:       2.35,
-    rayBrightnessMult: 0.10,   // low core brightness; relies on size+halo for the glow
+    rayBrightnessMult: 0.05,   // low core brightness; relies on size+halo for the glow
     raySizeMult:      2.70,
     rayHaloMult:      1.90,
   };
@@ -439,9 +452,7 @@
      event that briefly displaces the canopy by tens of pixels. Gusts are
      coherent across ALL leaves at every height — that is the "whole field
      surges to the right when a gust comes through" experience.
-
-     José confirmed wind in particular: "the feeling of the wind movement
-     and gusts, you got it perfectly." Be careful when changing these. */
+ */
   const WIND = {
     base: 0, baseY: 0, gust: 0,
     gustTarget: 0, gustPhase: 'idle',
@@ -563,7 +574,60 @@
   const ctx = canvas.getContext('2d');
   let W = 0, H = 0, DPR = 1;
   let dustedBase = null;
-  let leafBrush = null, branchBrush = null, rayBrush = null;
+  let leafBrush = null, branchBrush = null, rayBrush = null, densityBrush = null;
+
+  /* ──────────────────────── DENSITY FIELD ────────────────────────────
+     Per-frame canopy coverage map at downscaled resolution. Each frame
+     we stamp every leaf's CURRENT projected position into a small
+     offscreen buffer (with the same wind + layer math as the main
+     leaf draw), then read back the pixel data. The drawLightRays
+     function samples this buffer at each ray's position and multiplies
+     the ray's alpha by (1 - density)^RAY_REVEAL_POWER — so a ray
+     brightens in a real gap and vanishes where canopy is dense. As
+     layers drift, the gap pattern at each spot changes, and rays
+     wink in place. That is the mechanism that turns rays from "static
+     spots translating under drifting leaves" (the old approach) into
+     "rays of light flickering in and out as the leaves move" (the
+     experience José described).
+
+     DENSITY_DOWNSCALE = 4 means the density buffer is W/4 × H/4. On
+     a 1920×1080 viewport that's 480×270 ≈ 130K pixels (~520 KB read
+     back per frame via getImageData). Lower the number for crisper
+     gap detection, raise it for cheaper builds.
+
+     RAY_REVEAL_POWER controls the shape of the (1 - density)^p curve:
+     1.0 = linear (soft fade); 2.0+ = sharper, so only real gaps light
+     up and partial coverage stays dim. Higher = more "flicker." */
+  const DENSITY_DOWNSCALE = 4;
+  const RAY_REVEAL_POWER = 2.2;
+  /* Density dot: soft small white falloff stamped at each leaf's
+     projected position. Peak alpha is low so 4–5 overlapping leaves
+     saturate to "fully covered" — i.e. takes a small clump to fully
+     occlude a ray, not just one. Tune the peak if rays feel too
+     stubborn (raise it) or too eager (lower it). */
+  const DENSITY_DOT_PROFILE = [
+    [0.00, 0.25],
+    [0.40, 0.20],
+    [0.80, 0.07],
+    [1.00, 0.00],
+  ];
+  const DENSITY_WHITE = [255, 255, 255];
+  let densityCanvas = null;
+  let densityCtx = null;
+  let densityData = null;
+  let densityW = 0, densityH = 0;
+
+  function setupDensity() {
+    densityW = Math.max(2, Math.ceil(W / DENSITY_DOWNSCALE));
+    densityH = Math.max(2, Math.ceil(H / DENSITY_DOWNSCALE));
+    if (!densityCanvas) {
+      densityCanvas = document.createElement('canvas');
+      densityCtx = densityCanvas.getContext('2d', { willReadFrequently: true });
+    }
+    densityCanvas.width = densityW;
+    densityCanvas.height = densityH;
+    densityData = null;
+  }
 
   function regenerateBrushes() {
     const leafRadius   = Math.max(14, Math.min(W, H) * 0.022) * PARAMS.leafSizeMult;
@@ -574,6 +638,13 @@
     leafBrush   = makeShadowBrush(leafRadius,   RGB.deepShadow, LEAF_PROFILE,   PARAMS.leafAlphaMult);
     branchBrush = makeShadowBrush(branchRadius, RGB.deepShadow, BRANCH_PROFILE, PARAMS.branchAlphaMult);
     rayBrush    = makeShadowBrush(rayRadius,    RGB.sunImage,   RAY_PROFILE,    PARAMS.rayBrightnessMult);
+    // Density brush — sized so each leaf stamps a soft dot in the
+    // density buffer at roughly the same effective radius the leaf
+    // shadow covers in the main render. 0.75 of leafRadius captures
+    // the umbra-ish core; the rim of the leaf's shadow is too faint
+    // to "count" as occluding a sun-ray.
+    const densityRadius = Math.max(2, (leafRadius / DENSITY_DOWNSCALE) * 0.75);
+    densityBrush = makeShadowBrush(densityRadius, DENSITY_WHITE, DENSITY_DOT_PROFILE, 1);
   }
 
   function resize() {
@@ -587,6 +658,7 @@
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     buildScene(W, H);
     dustedBase = makeDustedBase(W, H, RGB.sunlitPool, 5.0);
+    setupDensity();
     regenerateBrushes();
   }
 
@@ -597,27 +669,82 @@
     ];
   }
 
-  /* Light rays drawn BEFORE leaves. Static on the ground; leaves drift
-     over them. Where a leaf currently covers a ray, that ray is dim;
-     when the canopy parts, the ray re-appears. Additive blending so
-     bright spots actually rise ABOVE the surrounding sunlit ground
-     brightness, matching the perceptual brightness of a real pinhole
-     sun image vs. ambient ground in shade.
+  /* Stamp every leaf's CURRENT projected position into the density
+     buffer. Uses identical wind + layer + projection math to
+     drawLeafShadow so the density field is in lockstep with what the
+     main canvas leaves will paint at this same t. After all leaves
+     are stamped we read the pixel data back as a Uint8ClampedArray;
+     drawLightRays then samples it per ray. */
+  function buildDensityField(allLeaves, originX, originY, maxZ, t) {
+    const dctx = densityCtx;
+    dctx.globalCompositeOperation = 'source-over';
+    dctx.fillStyle = 'black';
+    dctx.fillRect(0, 0, densityW, densityH);
+    dctx.globalCompositeOperation = 'lighter';
 
-     KNOWN LIMITATION (see top-of-file iteration note): with the
-     current dial-set this reads more as "soft glows that translate"
-     than "rays winking in and out." The mechanism is correct but the
-     visual still needs work. */
+    const ds = 1 / DENSITY_DOWNSCALE;
+    const halfSize = densityBrush.width * 0.5;
+    const dW = densityW, dH = densityH;
+
+    for (let i = 0; i < allLeaves.length; i++) {
+      const leaf = allLeaves[i];
+      const z = leaf.pos[2];
+      const heightFactor = z / maxZ;
+      const bulkX = (WIND.base + WIND.gust) * heightFactor;
+      const bulkY = WIND.baseY * heightFactor;
+      const [layX, layY] = layerOffset(leaf.layer, t);
+      const wx = leaf.pos[0] + bulkX + layX;
+      const wy = leaf.pos[1] + bulkY + layY;
+      const [sx, sy] = project(wx, wy, z, originX, originY);
+      const dx = sx * ds;
+      const dy = sy * ds;
+      if (dx < -halfSize || dx > dW + halfSize ||
+          dy < -halfSize || dy > dH + halfSize) continue;
+      dctx.drawImage(densityBrush, dx - halfSize, dy - halfSize);
+    }
+
+    densityData = dctx.getImageData(0, 0, dW, dH).data;
+  }
+
+  /* Light rays drawn LAST, on top of the canopy. Each ray's alpha is
+     modulated by (1 - density)^RAY_REVEAL_POWER sampled from the
+     density field at its position: bright where the canopy is sparse
+     (a real gap is overhead), invisible where it's dense. As layer
+     drift makes gaps open and close at each spot, every ray winks
+     on and off IN PLACE — the literal "rays of light flicker in and
+     out as the leaves move." Additive ('lighter') blending so the
+     bright spots actually rise above the sunlit base, matching the
+     perceptual brightness of a real pinhole sun-image vs. ambient
+     ground in shade. */
   function drawLightRays(lightRays, originX, originY) {
+    if (!densityData) return;
     const prevOp = ctx.globalCompositeOperation;
     ctx.globalCompositeOperation = 'lighter';
     const r0 = rayBrush.width * 0.5;
+    const ds = 1 / DENSITY_DOWNSCALE;
+    const dW = densityW, dH = densityH;
+    const inv255 = 1 / 255;
+
     for (let i = 0; i < lightRays.length; i++) {
       const ray = lightRays[i];
       const x = ray.x + originX;
       const y = ray.y + originY;
+
+      // Nearest-neighbor density sample — the soft density brush
+      // already gives smooth falloff between samples, so we don't
+      // need bilinear here.
+      const dx = Math.floor(x * ds);
+      const dy = Math.floor(y * ds);
+      if (dx < 0 || dx >= dW || dy < 0 || dy >= dH) continue;
+      const density = densityData[(dy * dW + dx) * 4] * inv255;
+
+      const gapness = 1 - density;
+      if (gapness <= 0) continue;
+      const reveal = Math.pow(gapness, RAY_REVEAL_POWER);
+      if (reveal < 0.01) continue;
+
       const r = r0 * ray.sizeJitter;
-      ctx.globalAlpha = ray.brightJitter;
+      ctx.globalAlpha = ray.brightJitter * reveal;
       ctx.drawImage(rayBrush, x - r, y - r, r * 2, r * 2);
     }
     ctx.globalAlpha = 1;
@@ -671,19 +798,33 @@
     ctx.drawImage(dustedBase, 0, 0);
     const { originX, originY, allBranches, allLeaves, lightRays, maxZ } = scene;
 
-    // 1. Rays — bright spots on the sunlit base, before any canopy occludes.
-    if (PARAMS.rayBrightnessMult > 0 && lightRays && lightRays.length) {
-      drawLightRays(lightRays, originX, originY);
+    const drawRays = PARAMS.rayBrightnessMult > 0 && lightRays && lightRays.length;
+
+    // 1. Build the density field (offscreen). Same wind + layer math as
+    //    the leaf draw below, so the field is in lockstep with the
+    //    positions where leaves are about to paint at this t.
+    if (drawRays) {
+      buildDensityField(allLeaves, originX, originY, maxZ, t);
     }
-    // 2. Branches — under leaves, faint structural shadow.
+
+    // 2. Branches — faint structural shadow, under leaves.
     if (PARAMS.branchAlphaMult > 0) {
       for (let i = 0; i < allBranches.length; i++) {
         drawBranchShadow(allBranches[i], originX, originY, maxZ);
       }
     }
-    // 3. Leaves — the canopy. They occlude rays where they currently cover.
+
+    // 3. Leaves — the canopy. Casts the dappled shadow over the base.
     for (let i = 0; i < allLeaves.length; i++) {
       drawLeafShadow(allLeaves[i], originX, originY, maxZ, t);
+    }
+
+    // 4. Rays — drawn LAST, on top of everything. Modulated by the
+    //    density field so they only appear in real gaps. As layers
+    //    drift, gaps shift and rays wink in and out IN PLACE rather
+    //    than translating as static dots.
+    if (drawRays) {
+      drawLightRays(lightRays, originX, originY);
     }
   }
 
