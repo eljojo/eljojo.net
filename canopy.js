@@ -206,22 +206,22 @@
     gustStrengthMult: 2.20,
     gustFreqMult:     1.00,
 
-    // per-leaf fast scintillation — each leaf has a phase+freq and dims
-    // briefly as if pivoting edge-on to the sun in the breeze. This is
-    // the FAST flicker timescale (Hz), distinct from the slow layer
-    // drift (sub-Hz). scintAmp is the MAX depth of the dip (0 = no
-    // flicker, 1 = leaf fully vanishes briefly). The actual dip each
-    // frame is scaled by WIND_ACTIVITY (a per-frame value in [0, 1]
-    // derived from base wind + gust magnitude): zero wind ⇒ no flicker
-    // (static canopy), subtle breeze ⇒ shallow flicker, gust ⇒ full
-    // depth. scintWindPower shapes that curve — higher = more contrast
-    // between "calm breeze" and "gust" flicker. Scintillation is
-    // applied to BOTH the visible shadow AND the density-field stamp
-    // so gaps actually open at fast timescales.
-    scintAmp:         0.55,
-    scintFreqMin:     2.5,     // Hz — slowest leaves
-    scintFreqMax:     8.0,     // Hz — fastest leaves
-    scintWindPower:   1.5,     // >1 = subtle wind stays calm, gust really pops
+    // leaf orientation + wiggle — leaves are 3D ORIENTED DISKS, not
+    // 3D points. Each leaf has a stem direction (random in the ground
+    // plane) and rotates around that stem axis in the wind. Its shadow
+    // on the ground is an ellipse: long axis along the stem, short
+    // axis = R·|cos(tilt)|. At tilt = 0 the leaf is broad-face on and
+    // casts a full circular shadow; at tilt = π/2 it's edge-on to the
+    // sun and casts a thin sliver. As wind wiggles each leaf, its
+    // shadow PHYSICALLY CHANGES SHAPE — this is what makes the gaps
+    // between shadows open and close, which is what makes the light
+    // through those gaps flicker. There is no alpha-based "fade" here;
+    // the shape change IS the mechanism. The wiggle amplitude is scaled
+    // by WIND.activity so zero wind ⇒ leaves still ⇒ canopy static.
+    wiggleAmpMax:     1.0,     // rad — max tilt angle at full wind (~57°)
+    wiggleFreqMin:    1.5,     // Hz — slowest leaves
+    wiggleFreqMax:    5.5,     // Hz — fastest leaves
+    wiggleWindPower:  1.6,     // >1 = subtle breeze stays calm, gust really pops
 
     // gap-shaped reveal — additive warm light layer driven by the
     // inverse of the per-frame density field, upscaled with smoothing.
@@ -409,15 +409,15 @@
     return {
       pos: [x + jx, y + jy, Math.max(20, z + jz)],
       layer: 0,  // assigned later, after layers are built
-      // Per-leaf fast scintillation: phase + frequency. At render time
-      // both the visible shadow alpha and the density-field contribution
-      // are multiplied by 1 - scintAmp * max(0, sin(...))^2 — the
-      // squared-positive-lobe sharpens the dip so each leaf spends most
-      // of its cycle "broad-face on" (full shadow) and only briefly
-      // goes "edge-on" (much less shadow). The dips of thousands of
-      // leaves at different phases sum to the fast canopy-wide twinkle.
-      scintPhase: rng() * Math.PI * 2,
-      scintFreq:  PARAMS.scintFreqMin + rng() * (PARAMS.scintFreqMax - PARAMS.scintFreqMin),
+      // Orientation: stem direction (a 2D angle in the ground plane —
+      // the axis around which this leaf rotates), plus a baseTilt (rest
+      // tilt at zero wind, slight per-leaf variation so leaves don't
+      // all look identical) and a wiggle phase+freq driving the
+      // per-leaf rotation around the stem axis in the wind.
+      stemAngle:    rng() * Math.PI * 2,
+      baseTilt:     (rng() - 0.5) * 0.25,   // ±~7° rest tilt
+      wigglePhase:  rng() * Math.PI * 2,
+      wiggleFreq:   PARAMS.wiggleFreqMin + rng() * (PARAMS.wiggleFreqMax - PARAMS.wiggleFreqMin),
     };
   }
 
@@ -550,11 +550,20 @@
     gustTarget: 0, gustPhase: 'idle',
     gustStartedAt: 0, gustDuration: 0,
     nextGustAt: 0,
-    activity: 0,  // [0, 1], per-frame "how breezy is it right now"; scales scintillation depth
+    envelope: 0, // [0, 1], slow ~17s breathing — scales the BASE wind
+                 // amplitude so the canopy is calm most of the time and
+                 // breathes up to "subtle breeze" briefly. Independent
+                 // of gusts (which are their own random pulses).
+    activity: 0, // [0, 1], per-frame "how breezy is it right now";
+                 // drives per-leaf wiggle amplitude.
   };
-  const WIND_BASE_FREQ_X = 0.00045;
-  const WIND_BASE_FREQ_Y = 0.00031;
-  const WIND_BASE_AMP    = 4.5;
+  const WIND_BASE_FREQ_X     = 0.00045;
+  const WIND_BASE_FREQ_Y     = 0.00031;
+  const WIND_BASE_AMP        = 4.5;
+  const WIND_ENVELOPE_FREQ_A = 0.000055;  // ~19s period
+  const WIND_ENVELOPE_FREQ_B = 0.000094;  // ~11s period — beats with A for irregular calm/breeze cycles
+  const WIND_ENVELOPE_PHASE  = 2.3;
+  const WIND_ENVELOPE_POWER  = 2.5;       // raise to bias toward zero (long calm intervals)
   const GUST_MIN_INTERVAL_BASE = 9000;
   const GUST_MAX_INTERVAL_BASE = 18000;
   const GUST_MIN_PEAK_BASE     = 22;
@@ -571,8 +580,19 @@
   }
 
   function updateWind(t) {
-    WIND.base  = Math.sin(t * WIND_BASE_FREQ_X) * WIND_BASE_AMP * PARAMS.bulkWindMult;
-    WIND.baseY = Math.sin(t * WIND_BASE_FREQ_Y + 1.7) * WIND_BASE_AMP * 0.5 * PARAMS.bulkWindMult;
+    /* Slow envelope: beat of two low frequencies, biased toward zero
+       by the power. Most of the time WIND.envelope ≈ 0 (dead calm),
+       occasionally rises toward 1 (subtle breeze building up). This
+       is the "breathing in and out" of a calm spring day. Gusts are
+       SEPARATE — they fire on their own schedule regardless of the
+       envelope, so the rare gust still hits even in dead-calm intervals. */
+    const e1 = Math.sin(t * WIND_ENVELOPE_FREQ_A + WIND_ENVELOPE_PHASE);
+    const e2 = Math.sin(t * WIND_ENVELOPE_FREQ_B);
+    const eRaw = ((e1 + e2) * 0.5 + 1) * 0.5;  // average → [0, 1]
+    WIND.envelope = Math.pow(eRaw, WIND_ENVELOPE_POWER);
+
+    WIND.base  = Math.sin(t * WIND_BASE_FREQ_X) * WIND_BASE_AMP * PARAMS.bulkWindMult * WIND.envelope;
+    WIND.baseY = Math.sin(t * WIND_BASE_FREQ_Y + 1.7) * WIND_BASE_AMP * 0.5 * PARAMS.bulkWindMult * WIND.envelope;
     if (WIND.gustPhase === 'idle' && t >= WIND.nextGustAt) {
       WIND.gustPhase = 'ramp';
       WIND.gustStartedAt = t;
@@ -599,18 +619,18 @@
       }
     }
 
-    /* WIND.activity — drives leaf scintillation depth. Normalize the
-       current base and gust magnitudes to [0, 1] against their max
-       amplitudes, combine, and shape with scintWindPower. At true zero
-       wind (base ~ 0 and no gust) activity is 0 and leaves are
-       perfectly still; at gust peak it's 1.0 and scintillation runs at
-       full PARAMS.scintAmp depth. */
+    /* WIND.activity — drives the per-leaf wiggle amplitude. Normalize
+       the current base and gust magnitudes against their FULL maxes
+       (before envelope), combine, and shape with wiggleWindPower. At
+       true zero wind (envelope ~ 0 and no gust) activity is 0 and
+       leaves rotate by exactly baseTilt — the canopy is static; at
+       gust peak it's 1.0 and each leaf wiggles by ±wiggleAmpMax. */
     const baseAmpMax  = WIND_BASE_AMP   * PARAMS.bulkWindMult;
     const gustPeakMax = GUST_MAX_PEAK_BASE * PARAMS.gustStrengthMult;
     const baseSpeed = Math.abs(WIND.base) / Math.max(1e-6, baseAmpMax);
     const gustSpeed = Math.abs(WIND.gust) / Math.max(1e-6, gustPeakMax);
     const raw = Math.min(1, Math.hypot(baseSpeed, gustSpeed));
-    WIND.activity = Math.pow(raw, PARAMS.scintWindPower);
+    WIND.activity = Math.pow(raw, PARAMS.wiggleWindPower);
   }
 
   /* ──────────────────────── SCENE ───────────────────────────────────────
@@ -804,19 +824,19 @@
     ];
   }
 
-  /* Per-leaf scintillation factor in [1 - scintAmp, 1]. Sin gives
-     [-1, 1]; we keep only the positive lobe and square it, so each
-     leaf is "broad-face on" (factor near 1, full shadow) most of the
-     time and briefly "edge-on" (factor down, much less shadow). t is
-     ms; scintFreq is Hz. The dip is scaled by WIND.activity so a
-     dead-calm moment is truly static, a subtle breeze gives shallow
-     flicker, and a gust runs flicker at full PARAMS.scintAmp depth. */
-  function leafScint(leaf, t) {
+  /* Per-leaf tilt angle in radians at time t. baseTilt is the rest
+     orientation; the wiggle oscillates around it at this leaf's own
+     phase + frequency, with amplitude scaled by WIND.activity. At
+     activity = 0 a leaf is frozen at its baseTilt (no motion). At
+     activity = 1 it sweeps ±wiggleAmpMax. The tilt is the angle
+     between the leaf's face-normal and the sun-aligned "broad-face
+     on" direction; the leaf's projected shadow squashes by |cos(tilt)|
+     perpendicular to the stem. */
+  function leafTilt(leaf, t) {
     const activity = WIND.activity;
-    if (activity <= 0) return 1;
-    const s = Math.sin(t * 0.001 * leaf.scintFreq * 2 * Math.PI + leaf.scintPhase);
-    const dim = s > 0 ? s * s : 0;
-    return 1 - PARAMS.scintAmp * activity * dim;
+    if (activity <= 0) return leaf.baseTilt;
+    const w = Math.sin(t * 0.001 * leaf.wiggleFreq * 2 * Math.PI + leaf.wigglePhase);
+    return leaf.baseTilt + w * PARAMS.wiggleAmpMax * activity;
   }
 
   /* Stamp every leaf's CURRENT projected position into the density
@@ -850,14 +870,22 @@
       const dy = sy * ds;
       if (dx < -halfSize || dx > dW + halfSize ||
           dy < -halfSize || dy > dH + halfSize) continue;
-      // Scintillation must apply HERE too (in lockstep with the visible
-      // leaf draw) so the density field actually opens up at fast
-      // timescales. Without this the field is static between drifts and
-      // neither the gap reveal nor the rays will blink.
-      dctx.globalAlpha = leafScint(leaf, t);
-      dctx.drawImage(densityBrush, dx - halfSize, dy - halfSize);
+      /* Same elliptical stamp as the visible leaf shadow (must be in
+         lockstep so the density field opens/closes as the visible
+         shadows change shape). Rotate by stemAngle, squash Y by
+         |cos(tilt)|, translate to (dx, dy) in density-buffer coords. */
+      const tilt = leafTilt(leaf, t);
+      const squash = Math.abs(Math.cos(tilt));
+      const cosA = Math.cos(leaf.stemAngle);
+      const sinA = Math.sin(leaf.stemAngle);
+      dctx.setTransform(
+        cosA, sinA,
+        -sinA * squash, cosA * squash,
+        dx, dy,
+      );
+      dctx.drawImage(densityBrush, -halfSize, -halfSize);
     }
-    dctx.globalAlpha = 1;
+    dctx.setTransform(1, 0, 0, 1, 0, 0);
 
     densityData = dctx.getImageData(0, 0, dW, dH).data;
   }
@@ -972,10 +1000,24 @@
     const [sx, sy] = project(wx, wy, z, originX, originY);
     const sizeScale = 0.85 + heightFactor * 0.35;
     const r = leafBrush.width * 0.5 * sizeScale;
-    // Scintillation dims the leaf briefly as it goes edge-on. Caller
-    // resets globalAlpha after the loop.
-    ctx.globalAlpha = leafScint(leaf, t);
-    ctx.drawImage(leafBrush, sx - r, sy - r, r * 2, r * 2);
+    /* Oriented ellipse shadow: the leaf is an oriented disk that
+       rotates around its stem axis. As tilt goes from 0 (broad-face
+       on the sun) to π/2 (edge-on), the shadow's short axis (perp to
+       stem) shrinks from R to 0 — the shape physically changes.
+       Long axis (along stem) stays R. Implemented as a single
+       setTransform: rotate by stemAngle, scale Y by |cos(tilt)|,
+       translate to (sx, sy), all premultiplied by DPR. Caller
+       restores the identity transform after the loop. */
+    const tilt = leafTilt(leaf, t);
+    const squash = Math.abs(Math.cos(tilt));
+    const cosA = Math.cos(leaf.stemAngle);
+    const sinA = Math.sin(leaf.stemAngle);
+    ctx.setTransform(
+      cosA * DPR, sinA * DPR,
+      -sinA * squash * DPR, cosA * squash * DPR,
+      sx * DPR, sy * DPR,
+    );
+    ctx.drawImage(leafBrush, -r, -r, r * 2, r * 2);
   }
 
   function drawBranchShadow(branch, originX, originY, maxZ) {
@@ -1029,12 +1071,14 @@
     }
 
     // 3. Leaves — the canopy. Casts the dappled shadow over the base.
-    //    drawLeafShadow sets globalAlpha per leaf for scintillation; we
-    //    reset it once at the end of the loop.
+    //    Each leaf is an ORIENTED ELLIPSE that squashes from circle to
+    //    sliver as it tilts toward edge-on with the sun. drawLeafShadow
+    //    sets a custom setTransform per leaf; we restore the identity
+    //    (DPR-scaled) transform once after the loop.
     for (let i = 0; i < allLeaves.length; i++) {
       drawLeafShadow(allLeaves[i], originX, originY, maxZ, t);
     }
-    ctx.globalAlpha = 1;
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 
     // 4. Gap-shaped reveal — the dominant "shaped light" pass. Bright
     //    additive warm light layer wherever the density field reads
