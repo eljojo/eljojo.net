@@ -230,6 +230,14 @@
     wiggleFreqMin:    1.5,     // Hz — slowest leaves
     wiggleFreqMax:    5.5,     // Hz — fastest leaves
     wiggleWindPower:  1.4,     // >1 = subtle breeze stays calm, gust really pops
+    // Idle activity floor — even at true zero wind there's a tiny
+    // residual activity, so the availability gate is JUST barely above
+    // most leaves. The few leaves whose slow availability sin happens
+    // to peak near 1 still cross threshold occasionally and do shallow
+    // wiggles. Result: at idle, occasional sub-1Hz twinkles around the
+    // canopy rather than a perfectly frozen image. Set to 0 for truly
+    // dead-still idle.
+    idleActivity:     0.045,
 
     // gap-shaped reveal — additive warm light layer driven by the
     // inverse of the per-frame density field, upscaled with smoothing.
@@ -656,7 +664,12 @@
     const baseSpeed = Math.abs(WIND.base) / Math.max(1e-6, baseAmpMax);
     const gustSpeed = Math.abs(WIND.gust) / Math.max(1e-6, gustPeakMax);
     const raw = Math.min(1, Math.hypot(baseSpeed, gustSpeed));
-    WIND.activity = Math.pow(raw, PARAMS.wiggleWindPower);
+    const fromWind = Math.pow(raw, PARAMS.wiggleWindPower);
+    // Idle floor: even in dead-calm intervals there's a tiny residual
+    // activity so a few leaves still cross the availability threshold
+    // occasionally and produce rare shallow twinkles (real canopies
+    // never go perfectly still).
+    WIND.activity = Math.max(fromWind, PARAMS.idleActivity);
   }
 
   /* ──────────────────────── SCENE ───────────────────────────────────────
