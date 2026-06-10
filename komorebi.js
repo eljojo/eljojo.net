@@ -37,7 +37,7 @@ const lerpAngle = (a,b,t,period) => { const d=((b-a)%period + period*1.5)%period
 const MORPH_KEYS = [
   'core_angular_radius_deg','halo_angular_radius_deg','core_weight_fraction','cloud_thickness','eclipse_amount',
   'canopy_base_height_m','canopy_thickness_m',                          // layer heights — read live, no rebuild
-  'sun_elevation_deg','sun_azimuth_deg','view_extent_m','view_pitch_deg','view_fov_deg','exposure','contrast',
+  'sun_elevation_deg','sun_azimuth_deg','view_extent_m','view_pitch_deg','view_fov_deg','far_smear','exposure','contrast',
   'ambient_skylight','sky_turbidity','mesopic_strength',
   'ground_r','ground_g','ground_b',                                     // ground albedo (floor reflectance) — live look uniform, tweens in transitions
   'wind_strength','wind_direction_deg','gust_frequency','gust_attack','gust_decay',
@@ -137,6 +137,7 @@ const DEFAULTS = {
   view_extent_m: 4.0,              // vertical span of the visible ground (zoom = on-axis span, any tilt)
   view_pitch_deg: 16,              // camera tilt from straight-down (0 = top-down); gentle under-the-tree default
   view_fov_deg: 50,                // vertical FOV — perspective strength / lens
+  far_smear: 3.0,                  // far-field dapple smear: extra throw (m) per unit foreshortening; 0 = off, no effect top-down
   exposure: 1.3,
   contrast: 1.0,
   ambient_skylight: 0.5,
@@ -562,6 +563,7 @@ uniform float uViewExtent;
 uniform float uAspect;
 uniform float uPitch;            // camera tilt from straight-down (rad); 0 = top-down (reduces to the old ortho map)
 uniform float uFov;              // vertical full FOV (rad) — perspective strength / lens
+uniform float uFarSmear;         // far-field dapple smear (m of extra throw per unit foreshortening, §4.7)
 uniform vec3  uHazeColor;        // linear-HDR distance haze the far floor dissolves into (§4.7)
 uniform vec2  uCanopyOrigin;
 uniform vec2  uCanopyExtent;
@@ -594,12 +596,21 @@ void main(){
   float scale = uViewExtent*cp*cp / max(2.0*kf, 1e-4);               // hold the on-axis vertical span = uViewExtent
   float targetY = sp/max(cp,1e-4);                                    // recenter: screen centre -> world (0,0)
   vec2 world; float fog;
+  // far-field smear (spec §4.7): under a tilted gaze a pixel covers a growing patch of ground toward the
+  // horizon; point-sampling it aliases the dapple, so we widen the soft-shadow throw by that ground footprint.
+  // det(dworld/dvUv) = uViewExtent^2 * cp^4 * aspect / D^3 with D=-d.z, so the footprint's linear size goes as
+  // 1/D^1.5; referenced to the nearest row (D_ref=cp+kf*sp) it is exactly 0 at pitch 0 (uniform footprint, so
+  // top-down presets are untouched) and grows toward the horizon. Reusing uProj's g keeps the smear down-sun.
+  float extraThrow = 0.0;
   if (d.z >= -1e-4){ world=vec2(0.0); fog=1.0; }                       // ray at/over the horizon -> all haze
   else {
     float lam = -1.0/d.z;                                             // ray .. ground-plane (z=0) intersection
     world = vec2(scale*lam*d.x, scale*(lam*d.y - targetY));
     float halfExtent = 0.5*uViewExtent*max(length(vec2(uAspect,1.0)),1e-4);
     fog = smoothstep(1.15*halfExtent, 3.0*halfExtent, length(world));  // 0 across the whole frame at pitch 0
+    float Dref = cp + kf*sp;                                          // footprint of the nearest visible row
+    float fore = clamp(pow(Dref/max(-d.z,1e-4), 1.5) - 1.0, 0.0, 4.0); // 0 at pitch 0 & frame bottom; up toward horizon
+    extraThrow = uFarSmear * fore;                                     // extra throw -> wider, softer down-sun penumbra far off
   }
   vec3 acc = vec3(0.0);
   for(int i=0;i<MAX_SAMPLES;i++){
@@ -608,10 +619,10 @@ void main(){
     float w = uSamples[i].z;
     // light must clear EVERY layer -> multiply transmittance; shift grows with height
     vec3 T = vec3(1.0);
-    if(uLayerCount>0) T *= tap(uLayer[0], world + uLayerHeight[0]*g);
-    if(uLayerCount>1) T *= tap(uLayer[1], world + uLayerHeight[1]*g);
-    if(uLayerCount>2) T *= tap(uLayer[2], world + uLayerHeight[2]*g);
-    if(uLayerCount>3) T *= tap(uLayer[3], world + uLayerHeight[3]*g);
+    if(uLayerCount>0) T *= tap(uLayer[0], world + (uLayerHeight[0]+extraThrow)*g);
+    if(uLayerCount>1) T *= tap(uLayer[1], world + (uLayerHeight[1]+extraThrow)*g);
+    if(uLayerCount>2) T *= tap(uLayer[2], world + (uLayerHeight[2]+extraThrow)*g);
+    if(uLayerCount>3) T *= tap(uLayer[3], world + (uLayerHeight[3]+extraThrow)*g);
     acc += w*T;                              // sum of shifted sharp shadows == soft shadow
   }
   vec3 col = (acc*uSunColor + uAmbient) * uGround;   // reflect the floor irradiance off the ground albedo (dirt); white == old look
@@ -743,6 +754,7 @@ function create(canvas, opts){
     heights:loc(progTransport,'uLayerHeight[0]'), layerCount:loc(progTransport,'uLayerCount'),
     proj:loc(progTransport,'uProj'), viewExtent:loc(progTransport,'uViewExtent'), aspect:loc(progTransport,'uAspect'),
     pitch:loc(progTransport,'uPitch'), fov:loc(progTransport,'uFov'), haze:loc(progTransport,'uHazeColor'),
+    farSmear:loc(progTransport,'uFarSmear'),
     origin:loc(progTransport,'uCanopyOrigin'), extent:loc(progTransport,'uCanopyExtent'),
     sun:loc(progTransport,'uSunColor'), ambient:loc(progTransport,'uAmbient'), ground:loc(progTransport,'uGround'),
     twilight:loc(progTransport,'uTwilight'), mesopic:loc(progTransport,'uMesopic'),
@@ -1288,6 +1300,7 @@ function create(canvas, opts){
     gl.uniform1f(U.tp.aspect, canvas.width/canvas.height);
     gl.uniform1f(U.tp.pitch, clamp(params.view_pitch_deg,0,80)*DEG);     // camera tilt (rad); 0 = top-down
     gl.uniform1f(U.tp.fov, clamp(params.view_fov_deg,5,140)*DEG);        // vertical full FOV (rad)
+    gl.uniform1f(U.tp.farSmear, Math.max(0, params.far_smear));          // far-field dapple smear (§4.7); 0 at pitch 0 regardless
     gl.uniform2f(U.tp.origin, -E/2, -E/2);
     gl.uniform2f(U.tp.extent, E, E);
     // physical sun + sky colour from solar elevation (spec §3.5): warm/red low sun, ozone-blue shadows
