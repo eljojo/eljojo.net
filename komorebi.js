@@ -40,7 +40,7 @@ const MORPH_KEYS = [
   'sun_elevation_deg','sun_azimuth_deg','view_extent_m','view_pitch_deg','view_fov_deg','far_smear','exposure','contrast',
   'ambient_skylight','sky_turbidity','mesopic_strength',
   'ground_r','ground_g','ground_b',                                     // ground albedo (floor reflectance) — live look uniform, tweens in transitions
-  'wind_strength','wind_direction_deg','gust_frequency','gust_attack','gust_decay',
+  'wind_strength','wind_gustiness','wind_direction_deg','gust_frequency','weather_variability','weather_speed','gust_attack','gust_decay',
   'sway_stiffness','sway_ceiling','damping_ratio','backlash_gain','sway_height_gain',
   'limb_flex','twig_flex','stem_length','leaf_swing','flutter_freq',
   'drift_amount','drift_phase','drift_speed',
@@ -146,11 +146,15 @@ const DEFAULTS = {
   tone_map: 2,                     // 0 none, 1 reinhard, 2 aces
   ground_r: 1.0, ground_g: 1.0, ground_b: 1.0,   // ground albedo (floor reflectance, spec §4.7): white floor by default — a few looks set a warm dirt
   // Wind — coherent band (spec §5.1)
-  wind_strength: 0.0,
+  wind_pattern: 'gusty',           // broadband CHARACTER (steady|gusty|squally|choppy|lazy) — shape, shared knobs below
+  wind_strength: 0.0,              // "how much": mean force amplitude
+  wind_gustiness: 0.25,            // "how alive": turbulence intensity (σ/U) — steady ↔ gusty; deep lulls drive springback
   wind_direction_deg: 30,
-  gust_frequency: 0.12,
-  gust_attack: 1.2,
-  gust_decay: 2.5,
+  gust_frequency: 0.12,            // "how frequent": gust rate = lowest-octave frequency of the broadband signal
+  weather_variability: 0.0,        // slow self-evolving weather: 0 = static (presets unchanged), up = day drifts calm↔gusty + veers
+  weather_speed: 1.0,              // how fast the weather drifts (minute-scale at 1)
+  gust_attack: 1.2,                // gust-edge asymmetry: rise time constant — sharper (shorter) than the decay below
+  gust_decay: 2.5,                 // gust-edge asymmetry: decay time constant (field gusts rise sharper than they fall)
   sway_stiffness: 5.0,
   sway_ceiling: 0.4,
   damping_ratio: 0.25,
@@ -446,12 +450,39 @@ function hash3(a,b,c){ let h=(a^0x9E3779B1)>>>0;
   h=Math.imul(h^b,0x85EBCA6B)>>>0; h=Math.imul(h^c,0xC2B2AE35)>>>0;
   return (h^(h>>>15))>>>0; }
 
-// smooth, deterministic gust signal in [0,1] — mostly calm with occasional swells
-function gustShape(t, f){
-  let s = Math.sin(t*f*TAU)*0.6 + Math.sin(t*f*TAU*2.3+1.7)*0.3 + Math.sin(t*f*TAU*5.1+4.2)*0.1;
-  s = 0.5 + 0.5*s;
-  return clamp(s*s, 0, 1);          // square -> spend more time low, peak in gusts
+// ---- broadband wind signal (spec §5.1). Real wind is BROADBAND, not a single frequency — a single sine
+// reads as a machine because all its energy sits at one period. A frame-stable fractal sum of octaves over
+// TIME with per-octave amplitude gain G=2^(-H) gives a power spectrum ∝ f^-(2H+1): the Kolmogorov inertial
+// subrange is -5/3, i.e. H=1/3 → G≈0.794 (the number that makes a noise sum *feel* like wind — between
+// "pink" H=0 choppy and "brown" H=0.5 sluggish). Pure function of t → no per-frame RNG (all engine motion
+// is deterministic-of-time & reproducible, spec §4.4). H is the per-pattern "character" knob below. -------
+const VNOISE_STD = 0.496;                  // measured std of vnoise1 — normalizes fbm1 to ~unit std
+function vnoise1(x){                       // smooth 1-D value noise -> [-1,1]
+  const i=Math.floor(x), f=x-i, u=f*f*(3-2*f);
+  const a=(hash3(i>>>0,0x9E37,0x85EB)>>>0)/4294967296;
+  const b=(hash3((i+1)>>>0,0x9E37,0x85EB)>>>0)/4294967296;
+  return (a+(b-a)*u)*2-1;
 }
+// fractal Brownian motion in time, normalized to ~UNIT STANDARD DEVIATION (octaves are decorrelated, so
+// var(sum)=Σ amp²·var(vnoise); dividing by √(Σamp²)·VNOISE_STD gives σ≈1). Unit std is what makes the
+// gustiness knob mean turbulence-intensity (σ/U) honestly — without it, gustiness was nearly inert.
+function fbm1(t, freq, octaves, H){
+  const G=Math.pow(2,-H); let sum=0, amp=1, a2=0, fr=freq;
+  for(let i=0;i<octaves;i++){ sum+=amp*vnoise1(t*fr + i*19.7); a2+=amp*amp; amp*=G; fr*=2; }
+  return a2>0 ? sum/(Math.sqrt(a2)*VNOISE_STD) : 0;
+}
+// ---- wind PATTERNS (spec §5.1): a few broadband CHARACTERS, all reading the SAME shared knobs (strength,
+// gustiness, gust rate, direction, weather) but shaped differently inside. `H` = spectral slope (choppy↔
+// silky), `octaves` = detail depth, `lean` = steady downwind mean fraction (low → deeper lulls that drive
+// the springback through rest), `lat` = crosswind fraction (breaks the 1-D slide), `burst` = waveshape that
+// spikes peaks & deepens lulls (clustered/intermittent gusts). Selected by name (`wind_pattern`). ----------
+const WIND_PATTERNS = {
+  steady:  { H:0.72, octaves:4, lean:0.55, lat:0.45, burst:0.0 },   // smooth rolling directional breeze
+  gusty:   { H:0.34, octaves:5, lean:0.35, lat:0.75, burst:0.35 },  // Kolmogorov-ish, the natural default
+  squally: { H:0.24, octaves:5, lean:0.22, lat:0.85, burst:0.7 },   // bursty, sharp rises, deep clustered lulls
+  choppy:  { H:0.12, octaves:6, lean:0.30, lat:0.80, burst:0.25 },  // nervous fine high-freq, cold-front edge
+  lazy:    { H:0.88, octaves:3, lean:0.62, lat:0.40, burst:0.0 },   // very slow faint stir (pairs with glisten)
+};
 // a smooth, spatially-varying, slowly-evolving wind force — sampled at each node's position.
 function windNoise(x, y, t, k){
   const fx = Math.sin(x*k + t*0.9) + 0.5*Math.sin(y*k*1.3 - t*1.4 + 1.7);
@@ -729,8 +760,11 @@ function create(canvas, opts){
   // Auto-quality runtime throttle (driven by the params.auto_quality toggle). Holds the live
   // resolution / sample-count it trims to. Never touches the artistic params.
   const perf = { auto:false, quality:1, resScale:1, sampleCount:params.sample_count, acc:0, lowCount:0, hiCount:0, upWait:20 };
-  // Motion — one time-driven state, two bands (spec §5). u = sway as a fraction of ceiling.
-  const motion = { time:0, u:0, v:0, env:0, sway:[0,0] };
+  // Motion — one time-driven state, two bands (spec §5). u = longitudinal sway fraction (signed, along the
+  // effective wind), uLat = lateral (crosswind) sway fraction; each its own spring. windX/Y = the effective
+  // wind direction after the weather veer; weatherS = the live weather strength multiplier (read by the HUD);
+  // driveEnv = the asymmetric-edged longitudinal force; env = [0,1] gust intensity for the hierarchy breathing.
+  const motion = { time:0, u:0, v:0, uLat:0, vLat:0, env:0, driveEnv:0, sway:[0,0], windX:1, windY:0, weatherS:1 };
   // Transition — cloud-bloom crossfade between looks (spec §9). t walks 0->1 over dur: the continuous
   // params morph, the grove swaps once at the bloom peak, and `bloom` is a transient overcast that hides it.
   const trans = { active:false, t:0, dur:1.5, from:null, to:null, swapped:false, structDiff:false, canopyMorph:false, bloom:0, onEnd:null };
@@ -1129,7 +1163,7 @@ function create(canvas, opts){
     const wL = Math.max(0.3, params.sway_stiffness*0.5), wT = Math.max(0.3, params.sway_stiffness*2.0);
     const kL=wL*wL, kT=wT*wT, cL=2*dz*wL, cT=2*dz*wT, lf=params.limb_flex, tf=params.twig_flex;
     let maxv=0;
-    const wd=params.wind_direction_deg*DEG, wx=Math.cos(wd), wy=Math.sin(wd);   // downwind direction
+    const wx=motion.windX, wy=motion.windY;   // effective downwind direction (after the weather veer, §5.1)
     for(let i=0;i<hier.nLimb;i++){             // limbs pivot about the trunk; bend = wind TORQUE about it
       const dx=hier.limbDir[2*i], dy=hier.limbDir[2*i+1];
       const torque = dx*wy - dy*wx;            // cross(limbDir,wind): tip swings downwind, sign by side —
@@ -1168,30 +1202,61 @@ function create(canvas, opts){
   function motionActive(){
     return params.wind_strength>0 || (params.drift_auto && params.drift_amount>0)
         || Math.abs(motion.u)>1e-3 || Math.abs(motion.v)>1e-3   // keep simulating until settled
+        || Math.abs(motion.uLat)>1e-3 || Math.abs(motion.vLat)>1e-3
         || (hier && hier.maxV>2e-4);
   }
   function tick(dt){
     dt = clamp(dt, 0, 1/15);                                  // guard tab-switch spikes
-    // breathing: asymmetric one-pole envelope (attack ≠ decay) on the raw gust
-    const raw = gustShape(motion.time, params.gust_frequency);
-    const tc = (raw>motion.env) ? params.gust_attack : params.gust_decay;
-    motion.env += (raw - motion.env) * (1 - Math.exp(-dt/Math.max(tc,1e-3)));
-    const drive = params.wind_strength * motion.env;          // dimensionless; 1 ≈ stiffening onset
-    // underdamped nonlinear spring; rest is 0 (exact relaxation), wind is a force, not a target.
+    const t = motion.time;
+    const pat = WIND_PATTERNS[params.wind_pattern] || WIND_PATTERNS.gusty;
+    // ---- weather (minutes, spec §5.1): slow deterministic drift of overall STRENGTH and DIRECTION. At
+    // weather_variability 0 it is identity (weatherS=1, no veer), so presets are untouched. Driven by low-
+    // frequency noise-of-time, not stochastic OU — naturally bounded & mean-reverting, and keeps the whole
+    // signal a reproducible function of t (no per-frame RNG). This is "calm day vs gusty day", evolving. ----
+    const wv = params.weather_variability, wt = t*0.012*Math.max(1e-3, params.weather_speed);
+    const weatherS = clamp(1 + wv*0.85*fbm1(wt, 1, 3, 0.6), 0, 2.5);   // strength swells & lulls over minutes
+    const dirVeer  = wv*30*DEG*fbm1(wt+13.1, 1, 3, 0.6);               // ±~30° slow veer/back at full variability
+    const effStrength = params.wind_strength*weatherS;
+    const effDir = params.wind_direction_deg*DEG + dirVeer;
+    motion.windX = Math.cos(effDir); motion.windY = Math.sin(effDir); motion.weatherS = weatherS;   // weatherS exposed for the HUD
+    // ---- broadband gust force (seconds): the longitudinal channel carries a steady downwind LEAN plus a
+    // gustiness-scaled fluctuation that can dip below zero in deep lulls (so the spring recoils back THROUGH
+    // rest — the "comes back" fix); the lateral channel is pure decorrelated crosswind (so it is never a
+    // 1-D slide). gust_frequency = the lowest-octave rate; `burst` waveshapes for clustered/squally gusts. --
+    const rate = Math.max(1e-3, params.gust_frequency);
+    let gL = fbm1(t, rate, pat.octaves, pat.H);
+    let gT = fbm1(t+101.7, rate, pat.octaves, pat.H);         // decorrelated lateral stream
+    if(pat.burst>0){ const e=1+pat.burst*2;                   // spike peaks, deepen lulls (intermittency)
+      gL=Math.sign(gL)*Math.pow(Math.abs(gL),e); gT=Math.sign(gT)*Math.pow(Math.abs(gT),e); }
+    const ti = params.wind_gustiness;                         // turbulence intensity σ/U (gL,gT are unit-std)
+    const rawL = effStrength*(pat.lean + ti*gL);              // mean lean + fluctuation; <0 in strong lulls → springback through rest
+    const driveT = effStrength*(ti*pat.lat*gT);               // zero-mean crosswind
+    // gust-edge asymmetry: rise sharper than decay (validated). Reuses gust_attack/gust_decay as the slew. -
+    const tc = (rawL>motion.driveEnv) ? params.gust_attack : params.gust_decay;
+    motion.driveEnv += (rawL - motion.driveEnv) * (1 - Math.exp(-dt/Math.max(tc,1e-3)));
+    const driveL = motion.driveEnv;
+    // ---- two springs (longitudinal u, lateral uLat): underdamped, nonlinear stiffening at the ceiling,
+    // backlash (under-damped return stroke). rest = 0 → exact relaxation. wind is a force, not a target. ----
     const w = params.sway_stiffness;
     const steps = Math.max(1, Math.ceil(dt/(1/120)));         // substep for stability across ω
     const h = dt/steps;
+    const dz = params.damping_ratio, bl = params.backlash_gain;
+    const spring = (u, v, drive) => {                          // one Euler substep of the nonlinear spring
+      const denom = Math.max(0.02, 1 - u*u);                  // stiffening: restoring -> ∞ at ceiling
+      let damp = dz; if(u*v < 0) damp /= (1 + bl);            // whip-back: under-damp the return stroke
+      return v + (w*w*(drive - u/denom) - 2*damp*w*v)*h;      // new velocity
+    };
     for(let i=0;i<steps;i++){
-      const denom = Math.max(0.02, 1 - motion.u*motion.u);    // stiffening: restoring -> ∞ at ceiling
-      let damp = params.damping_ratio;
-      if(motion.u*motion.v < 0) damp /= (1 + params.backlash_gain);  // whip-back: under-damp the return
-      const a = w*w*(drive - motion.u/denom) - 2*damp*w*motion.v;
-      motion.v += a*h;
-      motion.u += motion.v*h;
+      motion.v = spring(motion.u, motion.v, driveL);     motion.u    += motion.v*h;
+      motion.vLat = spring(motion.uLat, motion.vLat, driveT); motion.uLat += motion.vLat*h;
     }
     motion.u = clamp(motion.u, -1.5, 1.5);                    // safety; stiffening keeps it near ±1
-    const dir = params.wind_direction_deg*DEG;
-    motion.sway = [Math.cos(dir)*motion.u*params.sway_ceiling, Math.sin(dir)*motion.u*params.sway_ceiling];
+    motion.uLat = clamp(motion.uLat, -1.5, 1.5);
+    // env: a [0,1] "current gust intensity" for the hierarchy breathing (replaces the old gust envelope)
+    motion.env += (clamp(Math.abs(motion.u), 0, 1) - motion.env) * (1 - Math.exp(-dt/0.6));
+    // compose world sway: u along the (veered) wind, uLat across it, scaled by the ceiling
+    const cx = motion.windX, cy = motion.windY, ceil = params.sway_ceiling;
+    motion.sway = [ (cx*motion.u - cy*motion.uLat)*ceil, (cy*motion.u + cx*motion.uLat)*ceil ];
     tickHierarchy(steps, h);                                  // limb + twig springs (medium band)
     motion.time += dt;
     // incoherent band: advance the drift phase (periodic in 2π). The editor reflects it in its slider.
@@ -1410,8 +1475,8 @@ function create(canvas, opts){
     const tt = performance.now()/1000;
     const yaw = tt*0.25, cyw=Math.cos(yaw), syw=Math.sin(yaw);     // slow turntable so it reads as 3D
     const pitch = 24*DEG, hk=Math.cos(pitch), dk=Math.sin(pitch);
-    const wd=params.wind_direction_deg*DEG, wx=Math.cos(wd), wy=Math.sin(wd);
-    const lean = motion.u*0.9, sx0=motion.sway[0], sy0=motion.sway[1];   // wind: lean + trunk drift
+    const wx=motion.windX, wy=motion.windY;   // EFFECTIVE wind dir (weather-veered) — matches the bake & trunk drift
+    const lean = motion.u*0.9, sx0=motion.sway[0], sy0=motion.sway[1];   // wind: lean + trunk drift (drift carries the lateral channel)
     const offY = -0.4;
     const P = (p) => {                                   // 3D world (+wind) -> inset NDC
       const lf = lean*(p[2]/maxZ);                       // taller points lean more downwind

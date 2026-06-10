@@ -237,6 +237,22 @@ But a shared pivot springs a second trap: if every limb bends by the *same* angl
 
 **The joints are now real (a grown grove).** The kinematics above originally drove a *fake* skeleton (clustered points around the canopy centre). The canopy is now a grown grove (§4.5): each tree's limbs pivot about **its own** trunk, twigs about real grown stem joints, and the limb/twig torque is taken about that tree's trunk — so a gust leans every tree about its own base, not the frame centre. A leaf inherits its tree's limb-swing ∘ twig-swing ∘ the global trunk drift. The motion is still **2-D yaw** in the ground plane — branches turn about joints but do not yet *lean* in depth or foreshorten as they pitch. That 3-D step (lean + foreshorten, on the grown skeleton) is the next piece of work; the grown structure was its prerequisite, now in place.
 
+**Now realized: the forcing is BROADBAND, with weather and crosswind.** The first model drove the spring with a single near-sinusoidal gust (one `gust_frequency` plus an attack/decay envelope). It read as *mechanical and one-directional* — and the reason is physical: real wind is **broadband**, its energy spread across every timescale at once (a minute-long surge carrying second-scale gusts carrying sub-second flutter), falling off with a characteristic **Kolmogorov −5/3 power spectrum** in the gust range. A single frequency puts all its energy at one period, so the eye locks onto it and reads a machine. The cure is to drive the spring with a **fractal sum of octaves over time** — frame-stable noise-of-time, so still no sampling RNG (§4.4): the per-octave amplitude gain `G = 2^(−H)` sets the spectral slope, with `H = 1/3` the physically-correct wind value (between "pink" `H=0`, choppy/nervous, and "brown" `H=0.5`, smooth/sluggish). `H` *is* the **character** of the wind.
+
+Three controls fall out, each a real meteorological quantity:
+
+- **strength** — the mean force ("how much").
+- **gustiness** = **turbulence intensity** `σ/U` (≈0.1 calm … 0.2 open country … higher under a canopy) — "how alive." It scales the fluctuation against the mean; at high gustiness the deep lulls drop the force below the mean lean, so the spring recoils **back through rest** — the felt "comes back," now arising from the forcing itself, not only the backlash.
+- **gust rate** = the lowest-octave frequency ("how frequent"); faster octaves and flutter layer on top automatically. *(This is the old `gust_frequency`, reinterpreted as the base rate of the broadband signal.)*
+
+And the motion is no longer 1-D. A **lateral (crosswind) channel** — a second, decorrelated broadband stream on its own spring, perpendicular to the wind — runs alongside the longitudinal one (turbulence has no preferred sign across-wind, so it is genuinely bidirectional). The two compose into a 2-D sway, so the bulk drift **wanders** rather than tracking a dead-straight downwind line. *(This is the trunk-level seat of the §5.4 medium-band decorrelation; the limb/twig hierarchy adds the rest.)*
+
+**Wind "patterns" — a few broadband characters.** Rather than expose `H`, octave count, asymmetry and burstiness as raw knobs, they are bundled into a small named set — **steady · gusty · squally · choppy · lazy** — each a pre-tuned *character* that all read the **same** shared knobs (strength, gustiness, rate, direction, weather), shaped differently inside (spectral slope, detail depth, mean-lean fraction, crosswind fraction, and a waveshaper that spikes peaks and deepens lulls for clustered/intermittent gusts). The gust-edge **asymmetry** (rise sharper than decay, ~1.35×, validated in the field) survives as the existing attack/decay envelope, now slewing the broadband force. A pattern is selected by name (`wind_pattern`) — the same minimal surface the §9 looks reference; it can later be promoted to a per-pattern generator function without changing that surface.
+
+**Weather — the slowest band.** Above the gusts sits a **slow, self-evolving weather state**: low-frequency noise-of-time (again deterministic, so reproducible and frame-stable — a stochastic Ornstein–Uhlenbeck mean-reverting walk would do the same job but break the no-RNG rule) that drifts the **overall strength** (calm spells and gusty spells coming and going over minutes) and slowly **veers the direction**. `weather_variability` sets how much the day evolves on its own (0 = static, so existing looks are untouched) and `weather_speed` how fast. This is the difference between a calm afternoon and a gusty one — and it changes, unbidden, which way the wind leans.
+
+The lesson, restated and stronger: **the first primitive was wrong, not just mis-tuned.** Wind is not a frequency with an amplitude; it is a *spectrum across timescales*, with a mean that itself drifts. Strength / gustiness / rate / pattern / weather are that spectrum made controllable — the broadband signal subsumes the single gust, and the deep lulls + crosswind retire the "leans downwind and never comes back" tell on their own.
+
 ### 5.2 The incoherent band (bottom of the hierarchy)
 
 A **fast, spatially incoherent** forcing — "faint, in all directions" — that kicks **individual leaves and petioles** slightly differently, with almost no correlation between neighbors. That **decorrelation is the entire difference** from the coherent band: there, neighbors move together and shape is preserved; here, neighbors move independently, so gaps **reorganize** rather than translate.
@@ -262,11 +278,12 @@ The three motions are the **same structure seen at three timescales**, mapped on
 
 | Motion seen on the ground | Hierarchy level | Timescale |
 |---|---|---|
+| Wind **strengthens, calms, and veers** | (weather) modulates the whole coherent band | very slow (minutes) |
 | Pattern **translates** intact | whole tree / major limbs sway together | slow |
 | Gaps **morph and rearrange**, then recover | mid-branches & twigs flex differently from one another | medium |
 | Pattern **glistens** | each leaf trembles on its own petiole | fast |
 
-The two bands **coexist and sum.** On the spring afternoon, a gentle directional breeze and a fine all-directions shimmer were both present, in shifting proportion, moment to moment. **That proportion, plus the foliage density, is most of the expressive surface of the whole piece.**
+The bands **coexist and sum**, and the coherent band is itself **broadband** — not one slow rate but a fractal spread of them (§5.1), with a weather layer drifting its strength and direction on top. On the spring afternoon, a gentle directional breeze and a fine all-directions shimmer were both present, in shifting proportion, moment to moment. **That proportion, the wind's character (pattern + gustiness), and the foliage density are most of the expressive surface of the whole piece.**
 
 ---
 
@@ -277,7 +294,7 @@ The two bands **coexist and sum.** On the spring afternoon, a gentle directional
 - **Transport** is the shift-multiply-sum over **~16–48 source samples**, read in the fragment shader; target 60 fps.
 - **The spring graph** lives in the canopy objects; the two wind bands drive it.
 - **Render linear HDR, tone-map last.**
-- **One shared engine, two consumers.** The whole renderer is a standalone module — `komorebi.js`, exposing `Komorebi.create(canvas, { params })` → a handle (`apply(scope)`, `setParams`, `transitionTo(params, {duration, onEnd})` for a cloud-bloom crossfade between looks (§9), live `params`/`perf`/`motion`/`src`/`trans`, an `onFrame` hook). It runs its own rAF loop on whatever canvas it's handed and carries no UI. Two pages consume it: the **editor** (`komorebi.html` — the dev panel, HUD, source inset, preset management, sun-drag) and a **viewer** (the `index.html` page background — one preset, no UI). `create()` throws on missing WebGL2/float targets so the viewer can degrade to a static page.
+- **One shared engine, two consumers.** The whole renderer is a standalone module — `komorebi.js`, exposing `Komorebi.create(canvas, { params })` → a handle (`apply(scope)`, `setParams`, `transitionTo(params, {duration, onEnd})` for a cloud-bloom crossfade between looks (§9), live `params`/`perf`/`motion`/`src`/`trans`, an `onFrame` hook). It runs its own rAF loop on whatever canvas it's handed and carries no UI. Two pages consume it: the **editor** (`komorebi.html` — the dev panel, HUD, source inset, preset management, sun-drag) and a **viewer** (the `index.html` page background — a short rotating cycle of presets, no UI). `create()` throws on missing WebGL2/float targets so the viewer can degrade to a static page.
 
 ---
 
@@ -320,8 +337,11 @@ Grouped by subsystem; the knobs an implementer will actually expose.
 - `sun_elevation`, `sun_azimuth` *(build the 2×2 ground-projection matrix; owns the ellipse + shear)*
 
 **Wind — coherent band**
-- `direction`, `base_strength`
-- gust `attack`, `decay`, `frequency` (the breathing)
+- `wind_pattern` *(the broadband **character**: steady·gusty·squally·choppy·lazy — a named bundle of spectral slope/octaves/lean/crosswind/burst that all read the shared knobs below, §5.1)*
+- `direction`, `base_strength` *("how much")*
+- `wind_gustiness` *(turbulence intensity σ/U — "how alive"; high → deep lulls drive the springback through rest, §5.1)*
+- gust `frequency` *(now the **rate** = lowest-octave frequency of the broadband signal — "how frequent")*, `attack`, `decay` *(gust-edge asymmetry: rise sharper than decay, slewing the broadband force)*
+- weather: `weather_variability` *(how much the day self-evolves — strength swells/lulls + slow direction veer; 0 = static, looks untouched)*, `weather_speed` *(how fast it drifts, minute-scale)*
 - `stiffness`, `stiffening_curve` (nonlinear ceiling)
 - `damping_ratio`, `backlash_gain` (underdamped snap-back / overshoot)
 - hierarchy: `limb_count` (arms fanned from the trunk), `limb_flex`, `twig_flex` *(bend amplitudes — each is scaled by the wind **torque** about its pivot, so a uniform gust leans rather than spins)*, `stem_length` *(twig pivot offset toward the trunk; 0 = clump-scale swirl returns)*, `sway_height_gain` (higher layers ride longer levers)
@@ -363,7 +383,7 @@ These belong to the authoring tool, not the model, but they shape how the model 
 
   Runtime flags (`auto_quality`, the debug toggles) differing never trigger a bloom — they just settle at the end. The whole thing is one engine entry point, `transitionTo(params, {duration, onEnd})`; the arrow keys are only its first driver (a planned MIDI/event layer will call the same method). The duration is an editor knob, not stored in a look; arrow keys are ignored while a panel control is focused (so they still nudge a slider). Tiers 2–3 reuse the grove growth (§4.5) and the breathing-cloud (§3.4) as a *transition between* looks rather than a state *within* one — modelled, not a painted dissolve.
 - **Time of day (sun input).** An editor-only alternative to the raw `sun_elevation`/`sun_azimuth` sliders: a `time_of_day` + `latitude` pair that computes the sun's position for a **spring day** (equinox, declination ≈ 0) — hour angle 15°/hour from solar noon, `elevation = asin(cos lat · cos H)`, azimuth sweeping east→south→west — and writes elevation/azimuth. Latitude caps the noon sun (`90°−lat`). It's a one-way input helper (the angle params remain the source of truth, so presets store the angles, not the time). On a **touch** screen the canvas is swiped rather than drag-positioned: a **horizontal** swipe scrubs `time_of_day` live (the sun arcs across the day) and a **vertical** swipe steps presets (up = next), the desktop click-drag that frees the sun in 2-D being mouse-only.
-- **Page-background viewer.** The engine doubles as an ambient background for the homepage (`index.html`): a fixed full-bleed canvas with the page content on top, viewer-only (one preset, no panel, no input). It degrades to a static page if WebGL2 is unavailable. The editor (`komorebi.html`) and the viewer share the one engine (`komorebi.js`); see §6.
+- **Page-background viewer.** The engine doubles as an ambient background for the homepage (`index.html`): a fixed full-bleed canvas with the page content on top, viewer-only (no panel, no input). It **rotates through a short cycle of presets** (currently `morning 2` → `afternoon 5b` → `morning 3`), holding each ~30 s and then **cross-fading to the next with `transitionTo`** (the same §9 scene-transition engine the editor's arrow keys drive) — so the background quietly drifts through times of day on its own. It degrades to a static page if WebGL2 is unavailable (the whole thing is wrapped in a `try`, so the page stays fully usable without it). The editor (`komorebi.html`) and the viewer share the one engine (`komorebi.js`); see §6.
 
 ---
 
