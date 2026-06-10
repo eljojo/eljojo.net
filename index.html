@@ -43,11 +43,20 @@
       </div>
     <script src="komorebi.js?v=2026-06-09"></script>
     <script>
-      // Ambient komorebi background, viewer-only (single preset, no UI). Degrades to nothing
-      // if WebGL2 is unavailable — the page stays fully usable without it.
+      // Ambient komorebi background, viewer-only (no UI). Cycles between three presets every 30s,
+      // morphing live via transitionTo. Degrades to nothing if WebGL2 is unavailable — the page
+      // stays fully usable without it.
       try {
-        if (window.Komorebi) Komorebi.create(document.getElementById('komorebi-bg'),
-          { params: Komorebi.PRESETS['morning 2'] });
+        if (window.Komorebi) {
+          const cycle = ['morning 2', 'afternoon 5b', 'morning 3'];
+          const eng = Komorebi.create(document.getElementById('komorebi-bg'),
+            { params: Komorebi.PRESETS[cycle[0]] });
+          let i = 0;
+          setInterval(() => {
+            i = (i + 1) % cycle.length;
+            eng.transitionTo(Komorebi.PRESETS[cycle[i]], { duration: 5 });
+          }, 30000);
+        }
       } catch (e) { /* no WebGL2 / float targets: leave the static page as-is */ }
     </script>
   </body>
