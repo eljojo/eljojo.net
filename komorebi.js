@@ -175,92 +175,9 @@ const DEFAULTS = {
 };
 
 const BUILTIN_PRESETS = {
-  // The built-in looks: 'afternoon 4'–'7' (4/5/6 each have a 'b' variation), 'morning 1'–'3', 'test 1'–'2'
-  // (hidden), 'the void' and 'memories'. The editor boots into 'afternoon 7'; PRESET_ORDER (below) sets the
-  // dropdown / ← → order. Any saved (★) look is the user's own in local storage.
-  // DEFAULTS stays the merge base so old/partial JSON stays compatible.
-  'morning 1': Object.assign({}, DEFAULTS, {
-    "sample_count": 32, "core_angular_radius_deg": 0.56, "halo_angular_radius_deg": 4.8,
-    "core_weight_fraction": 0.61, "cloud_thickness": 0.39, "eclipse": false, "eclipse_amount": 0.42,
-    "layer_count": 3, "canopy_base_height_m": 4.2, "canopy_thickness_m": 2.6, "foliage_density": 1.65,
-    "tree_count": 5, "branch_levels": 3, "branch_children": 3, "branch_angle_deg": 34,
-    "branch_length_ratio": 0.62, "branch_pitch_deg": 26, "clusters_per_layer": 60, "leaves_per_cluster": 39,
-    "cluster_spread_m": 0.28, "leaf_size_m": 0.1, "leaf_aspect": 1.75, "max_tilt": 0.54, "edge_softness": 0.26,
-    "trans_r": 0.26, "trans_g": 0.356, "trans_b": 0.195, "canopy_extent_m": 7, "tex_resolution": 1024,
-    "seed": 290626672, "sun_elevation_deg": 29.5, "sun_azimuth_deg": 83,
-    "view_extent_m": 3.1, "exposure": 2.44, "contrast": 0.98, "ambient_skylight": 0.97, "tone_map": 2,
-    "wind_strength": 1.29, "wind_direction_deg": 0, "gust_frequency": 0.04, "gust_attack": 1.2, "gust_decay": 1.3,
-    "sway_stiffness": 1.2, "sway_ceiling": 0.4, "damping_ratio": 0.65, "backlash_gain": 1, "sway_height_gain": 0.75,
-    "limb_count": 11, "limb_flex": 0.25, "twig_flex": 0.18, "stem_length": 0.18, "leaf_swing": 1.35, "flutter_freq": 1.4,
-    "drift_amount": 0.145, "drift_phase": 4.8099656994860664, "drift_auto": true, "drift_speed": 0.04,
-    "auto_quality": true,
-  }),
-  'morning 2': Object.assign({}, DEFAULTS, {
-    "sample_count": 32, "core_angular_radius_deg": 0.56, "halo_angular_radius_deg": 4.8,
-    "core_weight_fraction": 0.61, "cloud_thickness": 0.39, "eclipse": false, "eclipse_amount": 0.42,
-    "layer_count": 3, "canopy_base_height_m": 4.2, "canopy_thickness_m": 2.6, "foliage_density": 1.65,
-    "tree_count": 5, "branch_levels": 3, "branch_children": 3, "branch_angle_deg": 34,
-    "branch_length_ratio": 0.62, "branch_pitch_deg": 26, "clusters_per_layer": 60, "leaves_per_cluster": 39,
-    "cluster_spread_m": 0.28, "leaf_size_m": 0.1, "leaf_aspect": 1.75, "max_tilt": 0.54, "edge_softness": 0.26,
-    "trans_r": 0.21, "trans_g": 0.356, "trans_b": 0.113, "canopy_extent_m": 7, "tex_resolution": 1024,
-    "seed": 290626672, "sun_elevation_deg": 23, "sun_azimuth_deg": 164,
-    "view_extent_m": 3.1, "exposure": 2.44, "contrast": 0.98, "ambient_skylight": 0.97, "sky_turbidity": 0.2, "mesopic_strength": 1, "tone_map": 2,
-    "wind_strength": 1.29, "wind_direction_deg": 0, "gust_frequency": 0.04, "gust_attack": 1.2, "gust_decay": 1.3,
-    "sway_stiffness": 1.2, "sway_ceiling": 0.4, "damping_ratio": 0.65, "backlash_gain": 1, "sway_height_gain": 0.75,
-    "limb_count": 11, "limb_flex": 0.25, "twig_flex": 0.18, "stem_length": 0.18, "leaf_swing": 1.35, "flutter_freq": 1.4,
-    "drift_amount": 0.145, "drift_phase": 4.97071372563982, "drift_auto": true, "drift_speed": 0.04,
-    "auto_quality": true,
-  }),
-  'morning 3': Object.assign({}, DEFAULTS, {
-    "sample_count": 32, "core_angular_radius_deg": 0.05, "halo_angular_radius_deg": 4.8,
-    "core_weight_fraction": 0.72, "cloud_thickness": 0.18, "eclipse": false, "eclipse_amount": 0.42,
-    "layer_count": 3, "canopy_base_height_m": 4.2, "canopy_thickness_m": 2.6, "foliage_density": 1.65,
-    "tree_count": 5, "branch_levels": 3, "branch_children": 3, "branch_angle_deg": 34,
-    "branch_length_ratio": 0.62, "branch_pitch_deg": 26, "clusters_per_layer": 60, "leaves_per_cluster": 39,
-    "cluster_spread_m": 0.28, "leaf_size_m": 0.1, "leaf_aspect": 1.75, "max_tilt": 0.54, "edge_softness": 0.26,
-    "trans_r": 0.21, "trans_g": 0.356, "trans_b": 0.336, "canopy_extent_m": 7, "tex_resolution": 1024,
-    "seed": 290626672, "sun_elevation_deg": 30, "sun_azimuth_deg": 125.26438968275465,
-    "view_extent_m": 3.1, "exposure": 2.44, "contrast": 0.98, "ambient_skylight": 0.97, "sky_turbidity": 0.05, "mesopic_strength": 0.6, "tone_map": 2,
-    "wind_strength": 1.29, "wind_direction_deg": 0, "gust_frequency": 0.04, "gust_attack": 1.2, "gust_decay": 1.3,
-    "sway_stiffness": 1.2, "sway_ceiling": 0.4, "damping_ratio": 0.65, "backlash_gain": 1, "sway_height_gain": 0.75,
-    "limb_count": 11, "limb_flex": 0.25, "twig_flex": 0.18, "stem_length": 0.18, "leaf_swing": 1.35, "flutter_freq": 1.4,
-    "drift_amount": 0.145, "drift_phase": 0.18025113743438262, "drift_auto": true, "drift_speed": 0.04,
-    "auto_quality": true,
-  }),
-  /* 'test 1' / 'test 2' — hidden for now, kept for the future. Uncomment this block to restore them to the preset list.
-  'test 1': Object.assign({}, DEFAULTS, {
-    "sample_count": 21, "core_angular_radius_deg": 0.18, "halo_angular_radius_deg": 4.3,
-    "core_weight_fraction": 1, "cloud_thickness": 0.27, "eclipse": false, "eclipse_amount": 0.55,
-    "layer_count": 3, "canopy_base_height_m": 3.2, "canopy_thickness_m": 2.6, "foliage_density": 1.65,
-    "tree_count": 5, "branch_levels": 3, "branch_children": 3, "branch_angle_deg": 34,
-    "branch_length_ratio": 0.62, "branch_pitch_deg": 26, "clusters_per_layer": 82, "leaves_per_cluster": 59,
-    "cluster_spread_m": 0.28, "leaf_size_m": 0.1, "leaf_aspect": 1.75, "max_tilt": 0.54, "edge_softness": 0.26,
-    "trans_r": 0.3, "trans_g": 0.61, "trans_b": 0.5, "canopy_extent_m": 7, "tex_resolution": 2048,
-    "seed": 290626672, "sun_elevation_deg": 57.61406249999991, "sun_azimuth_deg": 151.38398437500064,
-    "view_extent_m": 6.2, "exposure": 1.44, "contrast": 1.22, "ambient_skylight": 1.33, "tone_map": 2,
-    "wind_strength": 0, "wind_direction_deg": 30, "gust_frequency": 0.12, "gust_attack": 1.2, "gust_decay": 2.5,
-    "sway_stiffness": 5, "sway_ceiling": 0.4, "damping_ratio": 0.25, "backlash_gain": 1, "sway_height_gain": 0,
-    "limb_count": 8, "limb_flex": 0.25, "twig_flex": 0.35, "stem_length": 0.5, "leaf_swing": 0.7, "flutter_freq": 1.4,
-    "drift_amount": 0.145, "drift_phase": 3.6079756994865377, "drift_auto": true, "drift_speed": 0.08,
-    "auto_quality": false,
-  }),
-  'test 2': Object.assign({}, DEFAULTS, {
-    "sample_count": 21, "core_angular_radius_deg": 0.18, "halo_angular_radius_deg": 4.3,
-    "core_weight_fraction": 1, "cloud_thickness": 0.27, "eclipse": false, "eclipse_amount": 0.55,
-    "layer_count": 3, "canopy_base_height_m": 3.2, "canopy_thickness_m": 2.6, "foliage_density": 1.65,
-    "tree_count": 5, "branch_levels": 3, "branch_children": 3, "branch_angle_deg": 34,
-    "branch_length_ratio": 0.62, "branch_pitch_deg": 26, "clusters_per_layer": 82, "leaves_per_cluster": 59,
-    "cluster_spread_m": 0.28, "leaf_size_m": 0.1, "leaf_aspect": 1.75, "max_tilt": 0.54, "edge_softness": 0.26,
-    "trans_r": 0.29, "trans_g": 0.61, "trans_b": 0.466, "canopy_extent_m": 7, "tex_resolution": 2048,
-    "seed": 290626672, "sun_elevation_deg": 90, "sun_azimuth_deg": 360,
-    "view_extent_m": 6.2, "exposure": 1.44, "contrast": 1.22, "ambient_skylight": 1.33, "tone_map": 2,
-    "wind_strength": 1.34, "wind_direction_deg": 30, "gust_frequency": 0.125, "gust_attack": 1.2, "gust_decay": 2.5,
-    "sway_stiffness": 1.2, "sway_ceiling": 0.4, "damping_ratio": 0.25, "backlash_gain": 1, "sway_height_gain": 1.6,
-    "limb_count": 8, "limb_flex": 0.25, "twig_flex": 0.35, "stem_length": 0.5, "leaf_swing": 0.7, "flutter_freq": 1.4,
-    "drift_amount": 0.145, "drift_phase": 3.0914450851278223, "drift_auto": true, "drift_speed": 0.08,
-    "auto_quality": false,
-  }),
-  */
+  // The built-in looks. Definition order below IS the dropdown / ← → order — there is no separate
+  // order list to keep in sync. The editor boots into 'afternoon 7'; 'test 1'/'test 2' sit commented
+  // at the foot of this object. Any saved (★) look lives in local storage; DEFAULTS is the merge base.
   // 'afternoon 4' — windy predecessor; now a 3-tree grove with wider (52°) branching.
   'afternoon 4': Object.assign({}, DEFAULTS, {
     sample_count:32, core_angular_radius_deg:0.77, halo_angular_radius_deg:4.3,
@@ -379,24 +296,6 @@ const BUILTIN_PRESETS = {
     "ground_r": 0.33, "ground_g": 0.21, "ground_b": 0.12,   // warm Mount-Royal dirt floor
     "view_pitch_deg": 24, "view_fov_deg": 64,
   }),
-  // 'the void' — a dense 16-tree grove pulled wide (view 6.8 m), deep-green and low-sun.
-  'the void': Object.assign({}, DEFAULTS, {
-    "sample_count": 32, "core_angular_radius_deg": 0.56, "halo_angular_radius_deg": 4.8,
-    "core_weight_fraction": 0.61, "cloud_thickness": 0.27, "eclipse": false, "eclipse_amount": 0.42,
-    "layer_count": 3, "canopy_base_height_m": 4.2, "canopy_thickness_m": 2.6, "foliage_density": 1.65,
-    "tree_count": 16, "branch_levels": 3, "branch_children": 3, "branch_angle_deg": 34,
-    "branch_length_ratio": 0.62, "branch_pitch_deg": 26, "clusters_per_layer": 60, "leaves_per_cluster": 39,
-    "cluster_spread_m": 0.28, "leaf_size_m": 0.1, "leaf_aspect": 1.75, "max_tilt": 0.54, "edge_softness": 0.26,
-    "trans_r": 0.21, "trans_g": 0.356, "trans_b": 0.113, "canopy_extent_m": 7, "tex_resolution": 1024,
-    "seed": 290626672, "sun_elevation_deg": 23, "sun_azimuth_deg": 164,
-    "view_extent_m": 6.8, "exposure": 2.44, "contrast": 0.98, "ambient_skylight": 0.97, "sky_turbidity": 0.05, "mesopic_strength": 0.6, "tone_map": 2, "view_pitch_deg": 0,
-    "wind_strength": 1.29, "wind_direction_deg": 0, "gust_frequency": 0.04, "gust_attack": 1.2, "gust_decay": 1.3,
-    "sway_stiffness": 1.2, "sway_ceiling": 0.4, "damping_ratio": 0.65, "backlash_gain": 1, "sway_height_gain": 0.75,
-    "limb_count": 11, "limb_flex": 0.25, "twig_flex": 0.18, "stem_length": 0.18, "leaf_swing": 1.35, "flutter_freq": 1.4,
-    "drift_amount": 0.145, "drift_phase": 1.2709150851268554, "drift_auto": true, "drift_speed": 0.04,
-    "auto_quality": true,
-    "ground_r": 0.12, "ground_g": 0.16, "ground_b": 0.19,   // cool stone-grey floor
-  }),
   // 'memories' — the §1 north-star look: a sparse early-spring grove (foliage 0.45, so individual leaves
   // still matter), clear sky (cloud 0), open branching (children 6, length 0.91, pitch 45°), bright exposure.
   'memories': Object.assign({}, DEFAULTS, {
@@ -415,14 +314,128 @@ const BUILTIN_PRESETS = {
     "drift_amount": 0.145, "drift_phase": 5.568307189744262, "drift_auto": true, "drift_speed": 0.04,
     "auto_quality": true,
   }),
+  'morning 1': Object.assign({}, DEFAULTS, {
+    "sample_count": 32, "core_angular_radius_deg": 0.56, "halo_angular_radius_deg": 4.8,
+    "core_weight_fraction": 0.61, "cloud_thickness": 0.39, "eclipse": false, "eclipse_amount": 0.42,
+    "layer_count": 3, "canopy_base_height_m": 4.2, "canopy_thickness_m": 2.6, "foliage_density": 1.65,
+    "tree_count": 5, "branch_levels": 3, "branch_children": 3, "branch_angle_deg": 34,
+    "branch_length_ratio": 0.62, "branch_pitch_deg": 26, "clusters_per_layer": 60, "leaves_per_cluster": 39,
+    "cluster_spread_m": 0.28, "leaf_size_m": 0.1, "leaf_aspect": 1.75, "max_tilt": 0.54, "edge_softness": 0.26,
+    "trans_r": 0.26, "trans_g": 0.356, "trans_b": 0.195, "canopy_extent_m": 7, "tex_resolution": 1024,
+    "seed": 290626672, "sun_elevation_deg": 29.5, "sun_azimuth_deg": 83,
+    "view_extent_m": 3.1, "exposure": 2.44, "contrast": 0.98, "ambient_skylight": 0.97, "tone_map": 2,
+    "wind_strength": 1.29, "wind_direction_deg": 0, "gust_frequency": 0.04, "gust_attack": 1.2, "gust_decay": 1.3,
+    "sway_stiffness": 1.2, "sway_ceiling": 0.4, "damping_ratio": 0.65, "backlash_gain": 1, "sway_height_gain": 0.75,
+    "limb_count": 11, "limb_flex": 0.25, "twig_flex": 0.18, "stem_length": 0.18, "leaf_swing": 1.35, "flutter_freq": 1.4,
+    "drift_amount": 0.145, "drift_phase": 4.8099656994860664, "drift_auto": true, "drift_speed": 0.04,
+    "auto_quality": true,
+  }),
+  'morning 2': Object.assign({}, DEFAULTS, {
+    "sample_count": 32, "core_angular_radius_deg": 0.56, "halo_angular_radius_deg": 4.8,
+    "core_weight_fraction": 0.61, "cloud_thickness": 0.39, "eclipse": false, "eclipse_amount": 0.42,
+    "layer_count": 3, "canopy_base_height_m": 4.2, "canopy_thickness_m": 2.6, "foliage_density": 1.65,
+    "tree_count": 5, "branch_levels": 3, "branch_children": 3, "branch_angle_deg": 34,
+    "branch_length_ratio": 0.62, "branch_pitch_deg": 26, "clusters_per_layer": 60, "leaves_per_cluster": 39,
+    "cluster_spread_m": 0.28, "leaf_size_m": 0.1, "leaf_aspect": 1.75, "max_tilt": 0.54, "edge_softness": 0.26,
+    "trans_r": 0.21, "trans_g": 0.356, "trans_b": 0.113, "canopy_extent_m": 7, "tex_resolution": 1024,
+    "seed": 290626672, "sun_elevation_deg": 23, "sun_azimuth_deg": 164,
+    "view_extent_m": 3.1, "exposure": 2.44, "contrast": 0.98, "ambient_skylight": 0.97, "sky_turbidity": 0.2, "mesopic_strength": 1, "tone_map": 2,
+    "wind_strength": 1.29, "wind_direction_deg": 0, "gust_frequency": 0.04, "gust_attack": 1.2, "gust_decay": 1.3,
+    "sway_stiffness": 1.2, "sway_ceiling": 0.4, "damping_ratio": 0.65, "backlash_gain": 1, "sway_height_gain": 0.75,
+    "limb_count": 11, "limb_flex": 0.25, "twig_flex": 0.18, "stem_length": 0.18, "leaf_swing": 1.35, "flutter_freq": 1.4,
+    "drift_amount": 0.145, "drift_phase": 4.97071372563982, "drift_auto": true, "drift_speed": 0.04,
+    "auto_quality": true,
+  }),
+  'morning 3': Object.assign({}, DEFAULTS, {
+    "sample_count": 32, "core_angular_radius_deg": 0.05, "halo_angular_radius_deg": 4.8,
+    "core_weight_fraction": 0.72, "cloud_thickness": 0.18, "eclipse": false, "eclipse_amount": 0.42,
+    "layer_count": 3, "canopy_base_height_m": 4.2, "canopy_thickness_m": 2.6, "foliage_density": 1.65,
+    "tree_count": 5, "branch_levels": 3, "branch_children": 3, "branch_angle_deg": 34,
+    "branch_length_ratio": 0.62, "branch_pitch_deg": 26, "clusters_per_layer": 60, "leaves_per_cluster": 39,
+    "cluster_spread_m": 0.28, "leaf_size_m": 0.1, "leaf_aspect": 1.75, "max_tilt": 0.54, "edge_softness": 0.26,
+    "trans_r": 0.21, "trans_g": 0.356, "trans_b": 0.336, "canopy_extent_m": 7, "tex_resolution": 1024,
+    "seed": 290626672, "sun_elevation_deg": 30, "sun_azimuth_deg": 125.26438968275465,
+    "view_extent_m": 3.1, "exposure": 2.44, "contrast": 0.98, "ambient_skylight": 0.97, "sky_turbidity": 0.05, "mesopic_strength": 0.6, "tone_map": 2,
+    "wind_strength": 1.29, "wind_direction_deg": 0, "gust_frequency": 0.04, "gust_attack": 1.2, "gust_decay": 1.3,
+    "sway_stiffness": 1.2, "sway_ceiling": 0.4, "damping_ratio": 0.65, "backlash_gain": 1, "sway_height_gain": 0.75,
+    "limb_count": 11, "limb_flex": 0.25, "twig_flex": 0.18, "stem_length": 0.18, "leaf_swing": 1.35, "flutter_freq": 1.4,
+    "drift_amount": 0.145, "drift_phase": 0.18025113743438262, "drift_auto": true, "drift_speed": 0.04,
+    "auto_quality": true,
+  }),
+  // 'the void' — a dense 16-tree grove pulled wide (view 6.8 m), deep-green and low-sun.
+  'the void': Object.assign({}, DEFAULTS, {
+    "sample_count": 32, "core_angular_radius_deg": 0.56, "halo_angular_radius_deg": 4.8,
+    "core_weight_fraction": 0.61, "cloud_thickness": 0.27, "eclipse": false, "eclipse_amount": 0.42,
+    "layer_count": 3, "canopy_base_height_m": 4.2, "canopy_thickness_m": 2.6, "foliage_density": 1.65,
+    "tree_count": 16, "branch_levels": 3, "branch_children": 3, "branch_angle_deg": 34,
+    "branch_length_ratio": 0.62, "branch_pitch_deg": 26, "clusters_per_layer": 60, "leaves_per_cluster": 39,
+    "cluster_spread_m": 0.28, "leaf_size_m": 0.1, "leaf_aspect": 1.75, "max_tilt": 0.54, "edge_softness": 0.26,
+    "trans_r": 0.21, "trans_g": 0.356, "trans_b": 0.113, "canopy_extent_m": 7, "tex_resolution": 1024,
+    "seed": 290626672, "sun_elevation_deg": 23, "sun_azimuth_deg": 164,
+    "view_extent_m": 6.8, "exposure": 2.44, "contrast": 0.98, "ambient_skylight": 0.97, "sky_turbidity": 0.05, "mesopic_strength": 0.6, "tone_map": 2, "view_pitch_deg": 0,
+    "wind_strength": 1.29, "wind_direction_deg": 0, "gust_frequency": 0.04, "gust_attack": 1.2, "gust_decay": 1.3,
+    "sway_stiffness": 1.2, "sway_ceiling": 0.4, "damping_ratio": 0.65, "backlash_gain": 1, "sway_height_gain": 0.75,
+    "limb_count": 11, "limb_flex": 0.25, "twig_flex": 0.18, "stem_length": 0.18, "leaf_swing": 1.35, "flutter_freq": 1.4,
+    "drift_amount": 0.145, "drift_phase": 1.2709150851268554, "drift_auto": true, "drift_speed": 0.04,
+    "auto_quality": true,
+    "ground_r": 0.12, "ground_g": 0.16, "ground_b": 0.19,   // cool stone-grey floor
+  }),
+  // 'eclipse' — a single tree's gaps imaging a partially-eclipsed sun: every dapple becomes the same
+  // crescent (the moon disk zeroes part of the source cloud). Tiny crisp source, low far-smear and dim
+  // ambient keep the crescents sharp and eerie; only a barely-there wind stirs it (auto-drift off).
+  'eclipse': Object.assign({}, DEFAULTS, {
+    "sample_count": 48, "core_angular_radius_deg": 0.3, "halo_angular_radius_deg": 1,
+    "core_weight_fraction": 1, "cloud_thickness": 0, "eclipse": true, "eclipse_amount": 0.6,
+    "layer_count": 2, "canopy_base_height_m": 4.9, "canopy_thickness_m": 2.5, "foliage_density": 0.7,
+    "tree_count": 1, "branch_levels": 4, "branch_children": 3, "branch_angle_deg": 49,
+    "branch_length_ratio": 0.63, "branch_pitch_deg": 51, "clusters_per_layer": 60, "leaves_per_cluster": 49,
+    "cluster_spread_m": 0.25, "leaf_size_m": 0.175, "leaf_aspect": 1.75, "max_tilt": 0.84, "edge_softness": 0.09,
+    "trans_r": 0.488, "trans_g": 0.611, "trans_b": 0.494, "canopy_extent_m": 8.5, "tex_resolution": 1024,
+    "seed": 290626672, "sun_elevation_deg": 19.5, "sun_azimuth_deg": 109.22399419024259,
+    "view_extent_m": 4.2, "exposure": 2.1, "contrast": 0.98, "ambient_skylight": 0.4, "sky_turbidity": 0.05,
+    "mesopic_strength": 0.6, "tone_map": 2, "ground_r": 0.33, "ground_g": 0.21, "ground_b": 0.12,
+    "view_pitch_deg": 36, "view_fov_deg": 51, "far_smear": 1.0,
+    "wind_strength": 0.4, "wind_direction_deg": 0, "gust_frequency": 0.04, "gust_attack": 1.2, "gust_decay": 1.3,
+    "sway_stiffness": 1.2, "sway_ceiling": 0.4, "damping_ratio": 0.65, "backlash_gain": 1, "sway_height_gain": 0.75,
+    "limb_count": 21, "limb_flex": 0.39, "twig_flex": 0.18, "stem_length": 0.18, "leaf_swing": 0.5, "flutter_freq": 1.4,
+    "drift_amount": 0.145, "drift_phase": 5.430132496921517, "drift_auto": false, "drift_speed": 0.04,
+    "auto_quality": true,
+  }),
+  /* 'test 1' / 'test 2' — hidden for now, kept for the future. Uncomment this block to restore them to the preset list.
+  'test 1': Object.assign({}, DEFAULTS, {
+    "sample_count": 21, "core_angular_radius_deg": 0.18, "halo_angular_radius_deg": 4.3,
+    "core_weight_fraction": 1, "cloud_thickness": 0.27, "eclipse": false, "eclipse_amount": 0.55,
+    "layer_count": 3, "canopy_base_height_m": 3.2, "canopy_thickness_m": 2.6, "foliage_density": 1.65,
+    "tree_count": 5, "branch_levels": 3, "branch_children": 3, "branch_angle_deg": 34,
+    "branch_length_ratio": 0.62, "branch_pitch_deg": 26, "clusters_per_layer": 82, "leaves_per_cluster": 59,
+    "cluster_spread_m": 0.28, "leaf_size_m": 0.1, "leaf_aspect": 1.75, "max_tilt": 0.54, "edge_softness": 0.26,
+    "trans_r": 0.3, "trans_g": 0.61, "trans_b": 0.5, "canopy_extent_m": 7, "tex_resolution": 2048,
+    "seed": 290626672, "sun_elevation_deg": 57.61406249999991, "sun_azimuth_deg": 151.38398437500064,
+    "view_extent_m": 6.2, "exposure": 1.44, "contrast": 1.22, "ambient_skylight": 1.33, "tone_map": 2,
+    "wind_strength": 0, "wind_direction_deg": 30, "gust_frequency": 0.12, "gust_attack": 1.2, "gust_decay": 2.5,
+    "sway_stiffness": 5, "sway_ceiling": 0.4, "damping_ratio": 0.25, "backlash_gain": 1, "sway_height_gain": 0,
+    "limb_count": 8, "limb_flex": 0.25, "twig_flex": 0.35, "stem_length": 0.5, "leaf_swing": 0.7, "flutter_freq": 1.4,
+    "drift_amount": 0.145, "drift_phase": 3.6079756994865377, "drift_auto": true, "drift_speed": 0.08,
+    "auto_quality": false,
+  }),
+  'test 2': Object.assign({}, DEFAULTS, {
+    "sample_count": 21, "core_angular_radius_deg": 0.18, "halo_angular_radius_deg": 4.3,
+    "core_weight_fraction": 1, "cloud_thickness": 0.27, "eclipse": false, "eclipse_amount": 0.55,
+    "layer_count": 3, "canopy_base_height_m": 3.2, "canopy_thickness_m": 2.6, "foliage_density": 1.65,
+    "tree_count": 5, "branch_levels": 3, "branch_children": 3, "branch_angle_deg": 34,
+    "branch_length_ratio": 0.62, "branch_pitch_deg": 26, "clusters_per_layer": 82, "leaves_per_cluster": 59,
+    "cluster_spread_m": 0.28, "leaf_size_m": 0.1, "leaf_aspect": 1.75, "max_tilt": 0.54, "edge_softness": 0.26,
+    "trans_r": 0.29, "trans_g": 0.61, "trans_b": 0.466, "canopy_extent_m": 7, "tex_resolution": 2048,
+    "seed": 290626672, "sun_elevation_deg": 90, "sun_azimuth_deg": 360,
+    "view_extent_m": 6.2, "exposure": 1.44, "contrast": 1.22, "ambient_skylight": 1.33, "tone_map": 2,
+    "wind_strength": 1.34, "wind_direction_deg": 30, "gust_frequency": 0.125, "gust_attack": 1.2, "gust_decay": 2.5,
+    "sway_stiffness": 1.2, "sway_ceiling": 0.4, "damping_ratio": 0.25, "backlash_gain": 1, "sway_height_gain": 1.6,
+    "limb_count": 8, "limb_flex": 0.25, "twig_flex": 0.35, "stem_length": 0.5, "leaf_swing": 0.7, "flutter_freq": 1.4,
+    "drift_amount": 0.145, "drift_phase": 3.0914450851278223, "drift_auto": true, "drift_speed": 0.08,
+    "auto_quality": false,
+  }),
+  */
 };
-
-// Display / ← → stepping order: afternoons, then memories, mornings, the void. Explicit so it's independent
-// of definition order; any preset not listed falls to the end. This is what the editor's dropdown shows.
-const PRESET_ORDER = ['afternoon 4','afternoon 4b','afternoon 5','afternoon 5b','afternoon 6','afternoon 6b','afternoon 7','memories','morning 1','morning 2','morning 3','the void'];
-const ORDERED_PRESETS = {};
-for(const n of PRESET_ORDER) if(n in BUILTIN_PRESETS) ORDERED_PRESETS[n]=BUILTIN_PRESETS[n];
-for(const n in BUILTIN_PRESETS) if(!(n in ORDERED_PRESETS)) ORDERED_PRESETS[n]=BUILTIN_PRESETS[n];
 
 // ---- deterministic RNG so canopy is frame-stable & reproducible ------------
 function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a);
@@ -1513,5 +1526,5 @@ function create(canvas, opts){
   return eng;
 }
 
-return { create, PRESETS: ORDERED_PRESETS, DEFAULTS, MAX_LAYERS, MAX_SAMPLES, DEG };
+return { create, PRESETS: BUILTIN_PRESETS, DEFAULTS, MAX_LAYERS, MAX_SAMPLES, DEG };
 })();
