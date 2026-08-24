@@ -41,14 +41,15 @@
         <img src="backgrounds/2024.jpg" title="José Albornoz" alt="José Albornoz">
       </section>
       </div>
-    <script src="dist/komorebi.player.min.js?v=2026-06-11"></script>
+    <script src="dist/komorebi.embed.min.js?v=2026-08-24"></script>
     <script>
-      // Ambient komorebi background, viewer-only (no UI). Cycles between three presets every 30s,
-      // morphing live via transitionTo. Degrades to nothing if WebGL2 is unavailable — the page
-      // stays fully usable without it.
+      // Ambient komorebi background, viewer-only (no UI). Cycles four looks every 30s through
+      // transitionTo, which picks its own tier: the three floor looks morph live, and 'park 1'
+      // (faithful canopy + standing scene) is a mode flip, so it swaps under a short bloom.
+      // Degrades to nothing if WebGL2 is unavailable — the page stays fully usable without it.
       try {
         if (window.Komorebi) {
-          const cycle = ['morning 2', 'afternoon 5b', 'morning 3'];
+          const cycle = ['morning 2', 'afternoon 5b', 'morning 3', 'park 1'];
           const eng = Komorebi.create(document.getElementById('komorebi-bg'),
             { params: Komorebi.PRESETS[cycle[0]] });
           let i = 0;
