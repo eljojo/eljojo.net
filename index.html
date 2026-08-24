@@ -50,9 +50,9 @@
       try {
         if (window.Komorebi) {
           const cycle = ['morning 2', 'afternoon 5b', 'morning 3', 'park 1'];
+          let i = new Date().getMinutes() % cycle.length;   // the clock picks the entry point: same look for anyone loading in the same minute, a different one the next
           const eng = Komorebi.create(document.getElementById('komorebi-bg'),
-            { params: Komorebi.PRESETS[cycle[0]] });
-          let i = 0;
+            { params: Komorebi.PRESETS[cycle[i]] });
           setInterval(() => {
             i = (i + 1) % cycle.length;
             eng.transitionTo(Komorebi.PRESETS[cycle[i]], { duration: 5 });
